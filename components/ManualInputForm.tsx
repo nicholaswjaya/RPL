@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { calculateBillTotals } from "../lib/split";
 
 export interface Item {
   name: string;
@@ -44,9 +45,12 @@ export default function ManualInputForm({ onSubmit }: Props) {
     setItems(updated);
   };
 
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const taxAmount = (subtotal * taxRate) / 100;
-  const grandTotal = subtotal + taxAmount + service - discount;
+  const { subtotal, taxAmount, grandTotal } = calculateBillTotals(
+    items,
+    taxRate,
+    service,
+    discount
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
