@@ -1,16 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { BillData, Item } from "./ManualInputForm";
+import { BillData } from "./ManualInputForm";
 
 interface PersonAssignment {
   name: string;
   assignedItems: {
+    itemIndex: number;
     name: string;
     price: number;
     qty: number;
   }[];
-  sharingItems: string[]; // Daftar nama item sharing yang dimakan
+  sharingItems: number[];
 }
 
 interface Props {
@@ -20,18 +21,22 @@ interface Props {
 
 export default function SplitBillSection({ billData, onReset }: Props) {
   // Filter menu Single dan Sharing
-  const singleItemsPool = billData.items.filter((i) => !i.isSharing);
-  const sharingItemsPool = billData.items.filter((i) => i.isSharing);
+  const singleItemsPool = billData.items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => !item.isSharing);
+  const sharingItemsPool = billData.items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.isSharing);
 
   // Remaining Qty khusus menu Single
-  const [remainingSingleItems, setRemainingSingleItems] = useState<Item[]>(
-    singleItemsPool.map((item) => ({ ...item }))
+  const [remainingSingleItems, setRemainingSingleItems] = useState<Record<number, number>>(
+    () => Object.fromEntries(singleItemsPool.map(({ item, index }) => [index, item.qty]))
   );
 
   const [people, setPeople] = useState<PersonAssignment[]>([]);
   const [currentName, setCurrentName] = useState("");
-  const [currentSingleCart, setCurrentSingleCart] = useState<{ [itemName: string]: number }>({});
-  const [currentSharingCart, setCurrentSharingCart] = useState<{ [itemName: string]: boolean }>({});
+  const [currentSingleCart, setCurrentSingleCart] = useState<Record<number, number>>({});
+  const [currentSharingCart, setCurrentSharingCart] = useState<Record<number, boolean>>({});
 
   // Hitung multiplier Pajak/Service/Diskon
   const rawSubtotal = billData.items.reduce((acc, item) => acc + item.price * item.qty, 0);
@@ -40,27 +45,26 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   const multiplier = rawSubtotal > 0 ? netTotal / rawSubtotal : 1;
 
   // Handler Menu Single (+ / - Qty)
-  const handleSingleCart = (item: Item, delta: number) => {
-    const currentInCart = currentSingleCart[item.name] || 0;
-    if (delta > 0 && item.qty <= 0) return;
+  const handleSingleCart = (itemIndex: number, delta: number) => {
+    const currentInCart = currentSingleCart[itemIndex] || 0;
+    const remainingQty = remainingSingleItems[itemIndex] || 0;
+    if (delta > 0 && remainingQty <= 0) return;
     if (delta < 0 && currentInCart <= 0) return;
 
     const newCartQty = currentInCart + delta;
     const updatedCart = { ...currentSingleCart };
-    if (newCartQty <= 0) delete updatedCart[item.name];
-    else updatedCart[item.name] = newCartQty;
+    if (newCartQty <= 0) delete updatedCart[itemIndex];
+    else updatedCart[itemIndex] = newCartQty;
 
     setCurrentSingleCart(updatedCart);
-    setRemainingSingleItems((prev) =>
-      prev.map((i) => (i.name === item.name ? { ...i, qty: i.qty - delta } : i))
-    );
+    setRemainingSingleItems((prev) => ({ ...prev, [itemIndex]: remainingQty - delta }));
   };
 
   // Handler Checkbox Menu Sharing
-  const handleToggleSharing = (itemName: string) => {
+  const handleToggleSharing = (itemIndex: number) => {
     setCurrentSharingCart((prev) => ({
       ...prev,
-      [itemName]: !prev[itemName],
+      [itemIndex]: !prev[itemIndex],
     }));
   };
 
@@ -72,17 +76,20 @@ export default function SplitBillSection({ billData, onReset }: Props) {
       return;
     }
 
-    const assignedSingle = Object.keys(currentSingleCart).map((itemName) => {
-      const originalItem = billData.items.find((i) => i.name === itemName);
+    const assignedSingle = Object.entries(currentSingleCart).map(([itemIndex, qty]) => {
+      const index = Number(itemIndex);
+      const originalItem = billData.items[index];
       return {
-        name: itemName,
+        itemIndex: index,
+        name: originalItem.name,
         price: originalItem ? originalItem.price : 0,
-        qty: currentSingleCart[itemName],
+        qty,
       };
     });
 
-    const assignedSharing = Object.keys(currentSharingCart).filter(
-      (itemName) => currentSharingCart[itemName]
+    const assignedSharing = Object.keys(currentSharingCart)
+      .map(Number)
+      .filter((itemIndex) => currentSharingCart[itemIndex]
     );
 
     if (assignedSingle.length === 0 && assignedSharing.length === 0) {
@@ -108,18 +115,19 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   // Hapus Anggota
   const handleRemovePerson = (personIndex: number) => {
     const person = people[personIndex];
-    setRemainingSingleItems((prev) =>
-      prev.map((item) => {
-        const returned = person.assignedItems.find((i) => i.name === item.name);
-        return returned ? { ...item, qty: item.qty + returned.qty } : item;
-      })
-    );
+    setRemainingSingleItems((prev) => {
+      const updated = { ...prev };
+      person.assignedItems.forEach((item) => {
+        updated[item.itemIndex] = (updated[item.itemIndex] || 0) + item.qty;
+      });
+      return updated;
+    });
     setPeople(people.filter((_, idx) => idx !== personIndex));
   };
 
   // Hitung Berapa Orang yang Ikut Makan Tiap Menu Sharing
-  const getSharingEatersCount = (itemName: string) => {
-    return people.filter((p) => p.sharingItems.includes(itemName)).length;
+  const getSharingEatersCount = (itemIndex: number) => {
+    return people.filter((p) => p.sharingItems.includes(itemIndex)).length;
   };
 
   return (
@@ -148,29 +156,30 @@ export default function SplitBillSection({ billData, onReset }: Props) {
           </div>
 
           {/* Menu Single */}
-          {remainingSingleItems.length > 0 && (
+          {singleItemsPool.length > 0 && (
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-2">
                 Pilih Menu Personal (Single):
               </label>
               <div className="space-y-2">
-                {remainingSingleItems.map((item) => {
-                  const inCart = currentSingleCart[item.name] || 0;
+                {singleItemsPool.map(({ item, index }) => {
+                  const inCart = currentSingleCart[index] || 0;
+                  const remainingQty = remainingSingleItems[index] || 0;
                   return (
                     <div
-                      key={item.name}
+                      key={index}
                       className="flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border text-sm"
                     >
                       <div>
                         <span className="font-semibold text-gray-800">{item.name}</span>
                         <span className="text-xs text-gray-500 block">
-                          Rp {item.price.toLocaleString("id-ID")} | Sisa: {item.qty} porsi
+                          Rp {item.price.toLocaleString("id-ID")} | Sisa: {remainingQty} porsi
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => handleSingleCart(item, -1)}
+                          onClick={() => handleSingleCart(index, -1)}
                           disabled={inCart <= 0}
                           className="w-7 h-7 bg-red-100 text-red-600 font-bold rounded disabled:opacity-30"
                         >
@@ -179,8 +188,8 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                         <span className="w-6 text-center font-bold">{inCart}</span>
                         <button
                           type="button"
-                          onClick={() => handleSingleCart(item, 1)}
-                          disabled={item.qty <= 0}
+                          onClick={() => handleSingleCart(index, 1)}
+                          disabled={remainingQty <= 0}
                           className="w-7 h-7 bg-green-100 text-green-600 font-bold rounded disabled:opacity-30"
                         >
                           +
@@ -200,14 +209,14 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                 Centang Jika Orang Ini Ikut Makan Menu Sharing:
               </label>
               <div className="space-y-2">
-                {sharingItemsPool.map((item) => {
-                  const isChecked = !!currentSharingCart[item.name];
+                {sharingItemsPool.map(({ item, index }) => {
+                  const isChecked = !!currentSharingCart[index];
                   const totalSharingPrice = item.price * item.qty;
-                  const currentEaters = getSharingEatersCount(item.name);
+                  const currentEaters = getSharingEatersCount(index);
 
                   return (
                     <label
-                      key={item.name}
+                      key={index}
                       className={`flex justify-between items-center p-3 rounded-lg border cursor-pointer transition text-sm ${
                         isChecked
                           ? "bg-blue-50 border-blue-400 font-semibold"
@@ -218,7 +227,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                         <input
                           type="checkbox"
                           checked={isChecked}
-                          onChange={() => handleToggleSharing(item.name)}
+                          onChange={() => handleToggleSharing(index)}
                           className="w-4 h-4 text-blue-600 rounded"
                         />
                         <div>
@@ -267,10 +276,10 @@ export default function SplitBillSection({ billData, onReset }: Props) {
               );
 
               // 2. Subtotal dari item Sharing (Total Harga Menu / Jumlah Orang yang Makan)
-              const sharingSubtotal = person.sharingItems.reduce((acc, itemName) => {
-                const item = sharingItemsPool.find((i) => i.name === itemName);
+              const sharingSubtotal = person.sharingItems.reduce((acc, itemIndex) => {
+                const item = billData.items[itemIndex];
                 if (!item) return acc;
-                const eatersCount = getSharingEatersCount(itemName);
+                const eatersCount = getSharingEatersCount(itemIndex);
                 const itemTotalPrice = item.price * item.qty;
                 return acc + (eatersCount > 0 ? itemTotalPrice / eatersCount : 0);
               }, 0);
@@ -297,21 +306,21 @@ export default function SplitBillSection({ billData, onReset }: Props) {
 
                   {/* List Item Single */}
                   <div className="space-y-1">
-                    {person.assignedItems.map((i, itemIdx) => (
-                      <div key={itemIdx} className="flex justify-between text-xs text-gray-600">
+                    {person.assignedItems.map((i) => (
+                      <div key={i.itemIndex} className="flex justify-between text-xs text-gray-600">
                         <span>{i.name} ({i.qty}x)</span>
                         <span>Rp {(i.price * i.qty).toLocaleString("id-ID")}</span>
                       </div>
                     ))}
 
                     {/* List Item Sharing */}
-                    {person.sharingItems.map((itemName, itemIdx) => {
-                      const item = sharingItemsPool.find((i) => i.name === itemName);
-                      const eaters = getSharingEatersCount(itemName);
+                    {person.sharingItems.map((itemIndex) => {
+                      const item = billData.items[itemIndex];
+                      const eaters = getSharingEatersCount(itemIndex);
                       const cost = item ? (item.price * item.qty) / eaters : 0;
                       return (
-                        <div key={`s-${itemIdx}`} className="flex justify-between text-xs text-blue-800 bg-blue-100/50 p-1 rounded">
-                          <span>🍕 {itemName} (Sharing 1/{eaters} orang)</span>
+                        <div key={`s-${itemIndex}`} className="flex justify-between text-xs text-blue-800 bg-blue-100/50 p-1 rounded">
+                          <span>🍕 {item?.name} (Sharing 1/{eaters} orang)</span>
                           <span>Rp {Math.round(cost).toLocaleString("id-ID")}</span>
                         </div>
                       );

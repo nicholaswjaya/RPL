@@ -1,8 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import ManualInputForm, { BillData } from "../components/ManualInputForm";
+import ManualInputForm, { BillData, Item } from "../components/ManualInputForm";
 import SplitBillSection from "../components/SplitBillSection";
+
+interface ScanResponse {
+  items?: Item[];
+  tax?: number;
+  service?: number;
+  discount?: number;
+  error?: string;
+}
 
 export default function Home() {
   const [mode, setMode] = useState<"ai" | "manual">("manual");
@@ -39,11 +47,11 @@ export default function Home() {
         throw new Error(`Server error (${res.status}). Pastikan file app/api/scan/route.ts sudah benar.`);
       }
 
-      const data = await res.json();
+      const data: ScanResponse = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal scan struk");
 
       const items = data.items || [];
-      const subtotal = items.reduce((acc: number, item: any) => acc + item.price * item.qty, 0);
+      const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
       const taxAmount = typeof data.tax === "number" ? data.tax : 0;
       const taxRate = subtotal > 0 ? (taxAmount / subtotal) * 100 : 0;
 
@@ -54,8 +62,8 @@ export default function Home() {
         service: data.service || 0,
         discount: data.discount || 0,
       });
-    } catch (err: any) {
-      alert(err.message || "Gagal memproses AI");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Gagal memproses AI");
     } finally {
       setLoadingAI(false);
     }

@@ -38,7 +38,7 @@ export default function ManualInputForm({ onSubmit }: Props) {
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const updateItem = (index: number, field: keyof Item, value: any) => {
+  const updateItem = <K extends keyof Item>(index: number, field: K, value: Item[K]) => {
     const updated = [...items];
     updated[index] = { ...updated[index], [field]: value };
     setItems(updated);

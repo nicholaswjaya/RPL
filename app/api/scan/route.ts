@@ -48,7 +48,6 @@ export async function POST(req: Request) {
     const candidateModels = ["gemini-2.5-flash", "gemini-1.5-flash"];
     const MAX_RETRIES = 5; // Coba maksimal 5 kali secara diam-diam
     let validResult = null;
-    let lastError = null;
 
     // LOOP UTAMA: Terus coba sampai dapet output JSON + items yang valid
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -84,31 +83,46 @@ export async function POST(req: Request) {
           throw new Error("AI tidak mengembalikan format JSON yang sesuai.");
         }
 
-        const parsedData = JSON.parse(jsonMatch[0]);
+        const parsedData: unknown = JSON.parse(jsonMatch[0]);
 
         // Validasi struktur data: HARUS punya array items
-        if (!parsedData || !Array.isArray(parsedData.items) || parsedData.items.length === 0) {
+        if (
+          !parsedData ||
+          typeof parsedData !== "object" ||
+          !Array.isArray((parsedData as { items?: unknown }).items) ||
+          (parsedData as { items: unknown[] }).items.length === 0
+        ) {
           throw new Error("Hasil AI tidak memiliki array 'items' yang valid.");
         }
 
+        const receipt = parsedData as {
+          items: unknown[];
+          tax?: unknown;
+          service?: unknown;
+          discount?: unknown;
+        };
+
         // Kalau sampai sini, artinya DATA VALID & SUKSES!
         validResult = {
-          items: parsedData.items.map((item: any) => ({
-            name: item.name || "Item Struk",
-            price: typeof item.price === "number" ? item.price : 0,
-            qty: typeof item.qty === "number" ? item.qty : 1,
-          })),
-          tax: typeof parsedData.tax === "number" ? parsedData.tax : 0,
-          service: typeof parsedData.service === "number" ? parsedData.service : 0,
-          discount: typeof parsedData.discount === "number" ? parsedData.discount : 0,
+          items: receipt.items.map((value) => {
+            const item = value && typeof value === "object" ? value as Record<string, unknown> : {};
+            return {
+              name: typeof item.name === "string" && item.name ? item.name : "Item Struk",
+              price: typeof item.price === "number" ? item.price : 0,
+              qty: typeof item.qty === "number" ? item.qty : 1,
+            };
+          }),
+          tax: typeof receipt.tax === "number" ? receipt.tax : 0,
+          service: typeof receipt.service === "number" ? receipt.service : 0,
+          discount: typeof receipt.discount === "number" ? receipt.discount : 0,
         };
 
         console.log(`[Percobaan ${attempt}] SUKSES memproses struk!`);
         break; // Keluar dari loop percobaan karena sudah sukses
 
-      } catch (err: any) {
-        lastError = err;
-        console.warn(`[Percobaan ${attempt} Gagal]: ${err?.message || err}`);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`[Percobaan ${attempt} Gagal]: ${message}`);
 
         // Jika belum mencapai batas maksimum, tunggu 1.5 detik lalu coba lagi
         if (attempt < MAX_RETRIES) {
@@ -129,10 +143,10 @@ export async function POST(req: Request) {
     // Kirim hasil valid ke frontend
     return NextResponse.json(validResult);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Critical error backend:", error);
     return NextResponse.json(
-      { error: error?.message || "Terjadi kesalahan pada sistem backend." },
+      { error: error instanceof Error ? error.message : "Terjadi kesalahan pada sistem backend." },
       { status: 500 }
     );
   }
