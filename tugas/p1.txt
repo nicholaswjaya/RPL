@@ -1,0 +1,124 @@
+ALTERNATIF 1: Patungin — Platform Split Bill & Kalkulator Struk Otomatis (Rekomendasi Utama)
+1. Deskripsi Masalah
+Saat makan bersama di restoran atau kafe, kelompok mahasiswa atau rekan kerja sering kesulitan dalam membagi tagihan (split bill) dari nota/struk pembayaran fisik. Proses penghitungan manual menimbulkan beberapa masalah nyata:
+
+Kompleksitas Pajak, Service Fee, & Diskon: Restoran umumnya mengenakan pajak (PB1 10%), service charge (5–7%), atau diskon. Menghitung proporsi beban pajak per item makanan secara manual sangat rumit dan rawan salah hitung.
+
+Perhitungan Makanan Tengah (Sharing): Makanan yang dipesan untuk dimakan bersama (seperti Pizza, Dimsum, atau Nachos) sulit dibagi secara adil jika hanya dikira-kira manual.
+
+Ketidakpraktisan & Memakan Waktu: Memasukkan belasan nama menu dari nota kertas satu per satu ke dalam chat grup memakan waktu lama dan membuat suasana kumpul-kumpul menjadi canggung.
+
+2. Profil Target Pengguna
+Host / Pembuat Bill: Mahasiswa/individu yang membayar nota di kasir terlebih dahulu dan bertugas mengumpulkan uang patungan dari teman-temannya.
+
+Anggota Kelompok / Friends: Teman-teman yang ikut makan bersama dan membutuhkan transparansi nominal yang harus dibayarkan.
+
+3. Manfaat Aplikasi
+Mempercepat proses hitung patungan dari hitungan menit menjadi detik.
+
+Menghilangkan rasa canggung atau potensi perselisihan akibat salah hitung tagihan.
+
+Memberikan pembagian harga yang adil (fair) untuk makanan sharing dan proporsi pajak/diskon.
+
+4. Daftar Fitur Inti
+Scan Struk AI Vision (Automatic Scanning): Mengunggah foto struk untuk diekstrak otomatis menjadi data menu, harga, pajak, dan diskon (dilengkapi retry loop anti-gagal).
+
+Input Struk Manual & Hitung Pajak Persentase: Form dinamis input menu, harga, porsi, serta centang penanda menu Sharing.
+
+Pembagian Bill Interaktif (Split Bill Engine): Input nama anggota, alokasi menu single dengan pelacakan sisa porsi (quantity pool), dan centang partisipan menu sharing.
+
+Ringkasan Tagihan Proporsional: Kartu rincian bersih per orang yang sudah mencakup pajak & service fee proporsional.
+
+5. Fitur yang Tidak Dikerjakan (Out of Scope)
+Sistem autentikasi / login akun (menggunakan guest session).
+
+Integrasi Payment Gateway / transfer otomatis (pembayaran tetap dilakukan manual antar-user).
+
+Penyimpanan database jangka panjang (seluruh data disimpan sementara di client state).
+
+Ekspor file PDF/Gambar struk.
+
+6. Kriteria Keberhasilan Aplikasi
+AI berhasil mengekstrak data struk ke format JSON tanpa membuat tampilan crash jika terjadi lonjakan beban server.
+
+Form manual dan sistem pembagian kalkulasi (pajak persentase + menu sharing) menghasilkan angka yang akurat 100%.
+
+Tampilan antarmuka responsif di layar ponsel (mobile-friendly).
+
+ALTERNATIF 2: CampusFind — Sistem Informasi Lost and Found Kampus
+1. Deskripsi Masalah
+Informasi mengenai barang hilang atau ditemukan di lingkungan kampus saat ini masih tersebar di grup WhatsApp, Feeds Instagram, atau obrolan pribadi. Hal ini membuat informasi cepat tenggelam oleh pesan baru, sulit dicari melalui fitur pencarian biasa, serta tidak adanya status barang yang jelas (apakah masih hilang, sudah diverifikasi, atau sudah dikembalikan).
+
+2. Profil Target Pengguna
+Mahasiswa / Civitas Academica: Pengguna yang kehilangan barang atau menemukan barang di area kampus.
+
+Admin / Petugas Kampus (Satpam/Pengelola Facility): Petugas yang mengelola tempat penyimpanan barang hilang (lost & found center) dan memverifikasi klaim.
+
+3. Manfaat Aplikasi
+Menyediakan pusat database barang hilang dan ditemukan secara terstruktur.
+
+Mempermudah pencarian barang berdasarkan nama, kategori, lokasi, dan tanggal.
+
+Menghindari klaim ganda/palsu dengan proses verifikasi laporan yang jelas.
+
+4. Daftar Fitur Inti
+Pelaporan Barang Hilang & Ditemukan: Form unggah laporan beserta foto, deskripsi, lokasi terakhir, dan tanggal kejadian.
+
+Katalog & Pencarian Terfilter: Fitur search dan filter berdasarkan kategori (Elektronik, Dokumen, Aksesori) serta status barang.
+
+Sistem Ajukan Klaim: Mahasiswa dapat mengajukan klaim atas barang yang ditemukan dengan memberikan bukti kepemilikan.
+
+Dashboard Verifikasi Admin: Admin kampus dapat mengubah status barang (Lost, Found, In Verification, Claimed/Returned).
+
+5. Fitur yang Tidak Dikerjakan (Out of Scope)
+Fitur live chat real-time antar pengguna (klaim diarahkan langsung ke pos petugas).
+
+Pelacakan lokasi berbasis GPS / Maps interaktif.
+
+Notifikasi SMS / WhatsApp gateway otomatis.
+
+6. Kriteria Keberhasilan Aplikasi
+Pelapor dapat mengunggah laporan barang dan muncul secara real-time di katalog umum.
+
+Fitur pencarian kata kunci dan filter lokasi berfungsi akurat.
+
+Admin dapat memperbarui status barang hingga bertanda "Dikembalikan".
+
+ALTERNATIF 3: EduRoom — Sistem Pemesanan & Monitoring Ruang Diskusi Kampus
+1. Deskripsi Masalah
+Mahasiswa sering kesulitan menemukan ruang kosong untuk kerja kelompok, diskusi, atau rapat organisasi. Proses peminjaman ruangan yang masih manual/bersurat membuat jadwal pemakaian sering bentrok (double booking), transparansi jadwal ruangan yang kosong tidak terlihat, dan penggunaan ruangan menjadi tidak tertata.
+
+2. Profil Target Pengguna
+Mahasiswa / Kelompok Belajar: Pengguna yang membutuhkan ruangan untuk kegiatan akademik atau organisasi.
+
+Admin / Pengelola Gedung Kampus: Petugas yang menyetujui peminjaman dan mengontrol kapasitas ruangan.
+
+3. Manfaat Aplikasi
+Mencegah terjadinya pemesanan ganda (double booking) pada jam dan ruangan yang sama.
+
+Memudahkan mahasiswa melihat ketersediaan ruangan secara real-time dari HP.
+
+Mengoptimalkan penggunaan fasilitas gedung kampus secara efisien.
+
+4. Daftar Fitur Inti
+Katalog Ruangan & Fasilitas: Informasi detail kapasitas ruangan, ketersediaan AC/Proyektor, dan foto ruangan.
+
+Jadwal Ketersediaan (Calendar/Slot Time View): Tampilan slot jam mana saja yang masih kosong atau sudah terisi.
+
+Form Pengajuan Reservasi: Input nama kelompok, keperluan, durasi, dan jumlah personel.
+
+Panel Persetujuan Admin (Approval System): Admin dapat menyetujui (Approve) atau menolak (Reject) pengajuan sewa ruangan.
+
+5. Fitur yang Tidak Dikerjakan (Out of Scope)
+Pembayaran sewa ruangan (diasumsikan seluruh fasilitas kampus gratis untuk mahasiswa).
+
+Integrasi kunci pintu otomatis / smart lock IoT.
+
+Pembatasan kuota peminjaman per mahasiswa berdasarkan IPK/SKS.
+
+6. Kriteria Keberhasilan Aplikasi
+Sistem secara otomatis menolak pengajuan reservasi jika slot waktu dan ruangan tersebut sudah di-booking pengguna lain.
+
+Status pengajuan (Pending / Approved / Rejected) berubah secara transparan di layar mahasiswa.
+
+Tampilan slot waktu jadwal mudah dipahami di layar ponsel.

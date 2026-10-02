@@ -1,0 +1,60 @@
+================================================================================
+ALIRAN DATA (DATA FLOW) DAN PERAN KOMPONEN APLIKASI PATUNGIN
+================================================================================
+
+1. ALIRAN DATA (DATA FLOW)
+--------------------------------------------------------------------------------
+A. Input Phase (AI / Manual)
+   - User memilih metode input melalui halaman utama (app/page.tsx).
+   - Opsi Manual: User mengisi data langsung melalui komponen ManualInputForm.tsx.
+   - Opsi Scan AI: User mengunggah foto struk yang dikirimkan via HTTP POST (FormData) 
+     ke backend API route (/api/scan/route.ts).
+
+B. Normalization Data
+   - Baik hasil ekstraksi AI dari backend maupun input dari form manual disamakan 
+     struktur datanya menjadi satu tipe objek JavaScript standar: BillData.
+   - Struktur BillData mencakup:
+     * items: List menu (Nama, Harga, Qty, dan Flag IsSharing)
+     * taxRate: Persentase pajak (%)
+     * taxAmount: Nominal rupiah pajak
+     * service: Biaya layanan (Rp)
+     * discount: Potongan harga (Rp)
+
+C. Split Bill Phase
+   - State BillData yang sudah siap kemudian diteruskan sebagai props ke komponen 
+     SplitBillSection.tsx.
+
+D. Allocation & Math Engine
+   - Menu Personal (Single): Jumlah porsi (qty) di-assign ke keranjang anggota tertentu, 
+     dan sisa porsi di pool utama otomatis berkurang.
+   - Menu Patungan (Sharing): Sistem menghitung total anggota yang mencentang menu 
+     tersebut (EatersCount), lalu membagi harga menu secara merata:
+     [Harga Per Orang = Total Harga Menu / EatersCount]
+   - Proporsi Pajak & Service (Multiplier): Sistem menghitung faktor pengali berdasarkan 
+     rasio [Total Bersih / Subtotal] agar setiap orang membayar pajak & service fee 
+     secara adil dan proporsional sesuai nominal pesanan masing-masing.
+
+
+2. PERAN SETIAP KOMPONEN UTAMA
+--------------------------------------------------------------------------------
+- app/page.tsx (Coordinator / Main Page)
+  Mengatur navigasi tab antara mode "Scan AI" dan "Input Manual", mengelola state 
+  data bill utama (BillData), serta mengoordinasikan transisi tampilan ke komponen 
+  pembagian bill.
+
+- components/ManualInputForm.tsx (Input Form & Tax Calculator)
+  Menangani form dinamis untuk menambah/menghapus baris menu, mengatur porsi, 
+  menandai checkbox menu "Sharing", mengalkulasi persentase pajak ke nominal rupiah, 
+  serta menyusun objek BillData.
+
+- components/SplitBillSection.tsx (Split Engine & Member Manager)
+  Menangani pembuatan anggota kelompok, alokasi menu personal dengan pelacakan sisa 
+  porsi (quantity pool), pendaftaran partisipan menu sharing, serta kalkulasi total 
+  tagihan bersih akhir per individu secara real-time.
+
+- app/api/scan/route.ts (Backend AI Handler)
+  Menerima unggahan gambar struk, mengubahnya ke format base64, dan mengirimkannya 
+  ke Google Gemini Vision API. Dilengkapi mekanisme Retry Loop (hingga 5x percobaan) 
+  dengan delay untuk menangani kendala server AI sibuk (503 High Demand) tanpa 
+  membuat tampilan aplikasi crash.
+================================================================================

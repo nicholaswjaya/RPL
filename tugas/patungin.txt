@@ -1,0 +1,127 @@
+Nama/Judul Aplikasi
+
+Patungin — Aplikasi Calculators & Bill Splitter Otomatis
+Beberapa pilihan nama yang dipertimbangkan:
+
+Patungin — Platform Split Bill & Kalkulator Struk Otomatis
+
+PatunginApp — Aplikasi Hitung Patungan & Scan Struk
+
+PatunginYuk — Sistem Manajemen Split Bill & Nota Restoran
+
+Patungin — Fast & Fair Receipt Splitter
+
+Ide Utama Aplikasi
+
+Patungin adalah aplikasi web-based yang digunakan oleh kelompok teman, mahasiswa, atau rekan kerja untuk menghitung, membagi, dan mengelola pembagian tagihan (bill splitting) makan/belanja secara presisi dan transparan.
+Contoh Kasus: Budi, Ani, dan Dedi makan bersama di restoran.
+Budi membuka Patungin → memilih Scan Struk AI (upload foto nota) atau Input Manual → mengisi data menu:
+
+Pizza Meat Lover (1x - Rp 200.000) → Tandai: Sharing
+
+Nasi Goreng (1x - Rp 30.000) → Tandai: Single
+
+Es Teh (2x - Rp 20.000) → Tandai: Single
+
+Pajak: 10%
+
+Kemudian sistem menghitung total keseluruhan secara otomatis.
+Pada tahap pembagian (Split Bill Section):
+
+Budi: Mengambil Nasi Goreng (1x) & centang Pizza (Sharing).
+
+Ani: Mengambil Es Teh (1x) & centang Pizza (Sharing).
+
+Dedi: Mengambil Es Teh (1x) & centang Pizza (Sharing).
+
+Sistem Patungin secara otomatis membagi harga Pizza ($200.000 / 3 = Rp 66.667) serta mengalkulasikan persentase pajak (10%) secara proporsional ke tagihan masing-masing orang secara real-time.
+
+Deskripsi Masalah
+
+Saat ini proses menghitung dan membagi tagihan nota saat makan bersama sering dilakukan secara manual melalui:
+
+Kalkulator HP biasa
+
+Catatan teks / Chat grup WhatsApp
+
+Coretan di nota kertas
+
+Spreadsheet / Excel
+
+Cara manual tersebut menimbulkan beberapa masalah:
+
+Masalah 1 — Perhitungan Pajak & Service yang Rumit: Restoran sering mengenakan pajak (PB1 10%), service charge (5-7%), atau diskon. Menghitung proporsi pajak per item makanan secara manual menggunakan kalkulator HP sangat rumit dan rawan salah hitung.
+
+Masalah 2 — Kebingungan Menu Sharing (Makanan Tengah): Makanan yang dimakan bersama (seperti Pizza, Nachos, atau Paket Family) sulit dibagi secara adil jika hanya dikira-kira manual, yang sering menyebabkan ada pihak yang dirugikan atau tagihan tidak pas (underpaid/overpaid).
+
+Masalah 3 — Struk Fisik Hilang atau Tulisan Buram: Mengirimkan foto nota ke grup chat sering membuat anggota bingung melihat rincian harga per item, terutama jika struk panjang atau cetakan tulisan kurang jelas.
+
+Masalah 4 — Tidak Ada Rekap Tagihan Per Orang yang Transparan: Anggota grup sering ragu apakah nominal tagihan yang dibebankan kepadanya sudah benar-benar sesuai dengan apa yang ia makan beserta pajaknya.
+
+Masalah 5 — Proses Input Manual yang Memakan Waktu: Memasukkan belasan daftar menu dari nota satu per satu ke dalam catatan teks membutuhkan waktu lama dan sering membuat momen kumpul-kumpul menjadi canggung saat menentukan siapa bayar berapa.
+
+Rumusan Masalah
+
+Dari masalah tersebut, rumusan masalah untuk proyek Patungin adalah:
+
+Bagaimana menyediakan sistem kalkulasi split bill yang mampu memproses ekstrak data struk secara otomatis menggunakan kecerdasan buatan (AI Vision)?
+
+Bagaimana menyediakan mode input manual yang responsif sebagai alternatif bebas-gagal ketika server AI sedang mengalami antrean/gangguan?
+
+Bagaimana mengalkulasikan pajak (persentase) dan service fee secara proporsional dan akurat untuk setiap item yang dipesan?
+
+Bagaimana membagi tagihan untuk makanan sharing (makanan tengah) secara otomatis berdasarkan jumlah orang yang ikut makan?
+
+Bagaimana menyajikan rincian tagihan bersih per orang yang transparan dan mudah dipahami?
+
+Target Pengguna
+
+Target pengguna Patungin difokuskan pada 2 peran utama agar pengerjaan proyek sistem terarah dan realistis:
+
+A. User / Pembuat Bill (Host)
+User dapat:
+
+Mungunggah foto struk untuk dianalisis otomatis oleh AI (Gemini Vision).
+
+Mengisi atau mengedit daftar menu, harga, quantity, serta persentase pajak/service secara manual.
+
+Menandai tipe menu apakah bersifat Single (makanan personal) atau Sharing (makanan tengah).
+
+Menambahkan nama-nama anggota/teman yang ikut patungan.
+
+Memasukkan menu ke keranjang belanja masing-masing orang.
+
+Menandai orang yang ikut memakan menu sharing.
+
+Melihat hasil akhir rincian total tagihan per orang yang sudah mencakup hitungan pajak/diskon.
+
+B. Sistem Integrasi Backend & AI (System Engine)
+Sistem engine bertugas:
+
+Memproses ekstrak teks dari gambar struk menggunakan AI dengan mekanisme exponential backoff / retry loop saat trafik tinggi (503 High Demand).
+
+Menjamin format data balikan berupa JSON valid (items, tax, service, discount).
+
+Menghitung faktor pengali (multiplier) untuk pembagian pajak, service, dan diskon secara proporsional.
+
+Mengelola sisa porsi/quantity item agar tidak over-assigned.
+
+Manfaat Aplikasi
+
+Untuk Pengguna (Mahasiswa / Kelompok Teman / Rekan Kerja):
+
+Mempercepat proses hitung patungan secara signifikan (dari hitungan menit menjadi beberapa detik).
+
+Menghilangkan rasa canggung atau perselisihan akibat salah hitung tagihan.
+
+Memberikan pembagian harga yang adil (fair) untuk makanan sharing dan hitungan pajak.
+
+Menyediakan opsi input yang fleksibel (Scan AI cepat atau Input Manual anti-gagal).
+
+Untuk Pengembang / Pemilik Proyek:
+
+Memiliki aplikasi web portfolio-ready berbasis teknologi modern (Next.js App Router, TypeScript, Tailwind CSS, dan Google GenAI SDK).
+
+Menerapkan arsitektur resilience pattern (backoff retries, dynamic model fallback, dan client-side fallback) yang tahan terhadap kendala API pihak ketiga.
+
+Menguasai pengelolaan state management kompleks pada aplikasi React (penanganan keranjang, sisa quantity pool, dan kalkulasi proporsional).

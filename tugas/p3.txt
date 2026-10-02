@@ -1,0 +1,157 @@
+Build a simple full-stack web application named **Patungin**.
+Purpose:
+Help groups of friends, students, or colleagues scan/input restaurant receipts, calculate total expenses including proportional tax, service fees, and discounts, and split bills accurately—supporting both single-item assignments and shared-item cost allocation.
+
+Use this stack:
+
+* Frontend: React + TypeScript + Next.js (App Router) + Tailwind CSS
+* Backend: Next.js Route Handlers (API Routes) + Node.js
+* AI integration: Google GenAI SDK (@google/genai) / Gemini Vision API
+* API style: REST API
+* Deployment/Environment: Next.js App Router workspace using `.env.local` for `GEMINI_API_KEY`
+
+Code rules:
+
+* Do not add comments unless truly necessary.
+* Use PascalCase for all React components, TypeScript interfaces, types, enums, API DTOs, and JSON property names in shared schemas.
+* Local variables and internal helper functions may use camelCase.
+* Keep code lines below 150 characters where practical.
+* Use a clean and simple folder structure (`app/`, `components/`).
+* Do not add complex user authentication in this first version. Assume one host user creates and manages the split bill session.
+
+Main entities:
+
+1. ReceiptItem
+
+   * Name
+   * Price
+   * Qty
+   * IsSharing
+
+2. BillData
+
+   * Items
+   * TaxRate
+   * TaxAmount
+   * Service
+   * Discount
+
+3. AssignedSingleItem
+
+   * Name
+   * Price
+   * Qty
+
+4. PersonAssignment
+
+   * Name
+   * AssignedItems
+   * SharingItems
+
+5. FinalBillSummary
+
+   * Subtotal
+   * TaxAmount
+   * Service
+   * Discount
+   * GrandTotal
+   * People
+
+Calculation rules:
+
+* A single item subtotal is calculated as `Price` * `Qty`.
+* Total overall subtotal is the sum of all item subtotals in `BillData`.
+* Tax amount is calculated as `(Subtotal * TaxRate) / 100`.
+* Net total bill is calculated as `Subtotal + TaxAmount + Service - Discount`.
+* Proportional multiplier ratio is calculated as `NetTotal / Subtotal`.
+* Shared item cost per person is calculated as `(Price * Qty) / EatersCount`.
+* Individual person total bill is calculated as `Round((SingleSubtotal + SharingSubtotal) * Multiplier)`.
+
+Backend features:
+
+1. Automatic AI Receipt Scanning
+
+   * Endpoint to analyze receipt image and extract structured items, tax, service, and discount data.
+   * Accept multipart/form-data with image payload.
+   * Convert image file to base64 and process via Google GenAI SDK.
+   * Implement an automatic retry loop (up to 5 attempts with 1.5s delay) to handle 503 High Demand AI server errors gracefully.
+   * Parse JSON output securely using regular expression extraction to prevent broken responses.
+   * Return a result containing:
+     * Items
+     * Tax
+     * Service
+     * Discount
+   * Show a meaningful error if image parsing fails after maximum retries.
+
+2. Manual Bill Configuration & Calculation
+
+   * Process manual inputs for menu items, price, quantity, and sharing status.
+   * Calculate proportional tax percentage and overall bill metrics.
+   * Return formatted `BillData` ready for split bill allocation.
+
+Frontend pages & components:
+
+1. Main Coordinator Page (`app/page.tsx`)
+
+   * Mode selector: Switch between `Input Manual` and `Scan AI`.
+   * Form container for uploading receipt images to the AI scanner route.
+   * Smooth state transition to display `SplitBillSection` once `BillData` is initialized.
+
+2. Manual Input Form (`components/ManualInputForm.tsx`)
+
+   * Dynamic form to add, edit, or remove menu items.
+   * Checkbox toggle for `Sharing?` items.
+   * Real-time calculation of subtotal, tax percentage (%), service fee, and grand total.
+   * Submit button to finalize bill configuration.
+
+3. Split Bill Section (`components/SplitBillSection.tsx`)
+
+   * Member input form to add group participants by name.
+   * Item selection controls (+ / -) for single personal items with real-time remaining quantity tracking.
+   * Checkbox list for shared menu items (e.g., Pizza) with live eater count badges.
+   * Member cards displaying assigned items, proportional shared item costs, and calculated net totals.
+   * Delete button to remove participants and restore unassigned items back to the available pool.
+   * Status alert badge showing whether all menu items are fully assigned.
+
+UI requirements:
+
+* Use Indonesian language for all labels, buttons, placeholders, messages, and validation dialogs.
+* Create a clean, responsive mobile-friendly split bill dashboard.
+* Use simple tables, cards, badges, forms, and empty states.
+* Use status badge colors:
+
+  * Single Item / Unassigned: Neutral / Gray
+  * Sharing Item / Active Eater: Blue
+  * Complete / Fully Split: Green
+  * Warning / Unassigned Items Remaining: Amber
+
+Required API routes:
+
+* `POST /api/scan`
+
+Deliverables:
+
+* Complete frontend and backend Next.js source code.
+* `.env.local` template for `GEMINI_API_KEY`.
+* README documentation covering installation, local startup (`npm run dev`), AI retry architecture, and Git workflow.
+* Ensure the application builds successfully and all manual plus AI split bill capabilities work smoothly.
+
+Project structure:
+
+* Standard Next.js App Router structure.
+* Structure:
+
+```text
+patungin_app/
+  app/
+    api/
+      scan/
+        route.ts
+    layout.tsx
+    page.tsx
+  components/
+    ManualInputForm.tsx
+    SplitBillSection.tsx
+  .env.local
+  package.json
+  tailwind.config.ts
