@@ -50,7 +50,13 @@ export default function Home() {
       const data: ScanResponse = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal scan struk");
 
-      const items = data.items || [];
+      const rawItems = data.items || [];
+      const items = rawItems.map((item) => ({
+        name: item.name || "Item Struk",
+        price: Number(item.price) || 0,
+        qty: Number(item.qty) || 1,
+        isSharing: Boolean(item.isSharing),
+      }));
       const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
       const taxAmount = typeof data.tax === "number" ? data.tax : 0;
       const taxRate = subtotal > 0 ? (taxAmount / subtotal) * 100 : 0;

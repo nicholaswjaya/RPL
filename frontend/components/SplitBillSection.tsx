@@ -40,7 +40,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
 
   // Hitung multiplier Pajak/Service/Diskon
   const rawSubtotal = billData.items.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const taxAmount = billData.taxAmount || (rawSubtotal * (billData.taxRate || 0)) / 100;
+  const taxAmount = typeof billData.taxAmount === "number" ? billData.taxAmount : (rawSubtotal * (billData.taxRate || 0)) / 100;
   const netTotal = rawSubtotal + taxAmount + billData.service - billData.discount;
   const multiplier = rawSubtotal > 0 ? netTotal / rawSubtotal : 1;
 
@@ -81,7 +81,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
       const originalItem = billData.items[index];
       return {
         itemIndex: index,
-        name: originalItem.name,
+        name: originalItem ? originalItem.name : "Item Struk",
         price: originalItem ? originalItem.price : 0,
         qty,
       };
@@ -115,6 +115,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   // Hapus Anggota
   const handleRemovePerson = (personIndex: number) => {
     const person = people[personIndex];
+    if (!person) return;
     setRemainingSingleItems((prev) => {
       const updated = { ...prev };
       person.assignedItems.forEach((item) => {
