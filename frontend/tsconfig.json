@@ -24,13 +24,13 @@
     ]
   },
   "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
+    "frontend/next-env.d.ts",
+    "frontend/.next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx",
-    "../backend/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".next"
   ]
 }
