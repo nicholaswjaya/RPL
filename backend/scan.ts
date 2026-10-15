@@ -29,7 +29,7 @@ export async function processReceiptImage(
   const ai = new GoogleGenAI({ apiKey });
 
   const prompt = `
-    Analisis gambar struk ini dan ekstrak datanya ke dalam format JSON murni.
+    Analisis gambar struk ini dan ekstrak datanya ke dalam format JSON.
     Format JSON HARUS EXACT seperti ini:
     {
       "items": [
@@ -42,16 +42,16 @@ export async function processReceiptImage(
     Aturan:
     1. Properti "items" HARUS berupa Array berisi objek menu.
     2. Jika pajak/service/diskon tidak ada, beri nilai 0.
-    3. HANYA kembalikan teks JSON murni tanpa penjelasan atau markdown.
     `;
 
+  // ✅ PILIH MODEL RESMI DENGAN KUOTA GRATIS YANG COCOK UNTUK VISION/STRUK
   const candidateModels = [
-    "gemini-3.5-flash-lite",
-    "gemini-3-flash-preview",
-    "gemini-3.8-flash",
-    "gemini-flash-latest",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-pro",
   ];
-  const maxRetries = 5;
+  const maxRetries = 4;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     const currentModel = candidateModels[(attempt - 1) % candidateModels.length];
@@ -75,6 +75,10 @@ export async function processReceiptImage(
             ],
           },
         ],
+        // Force output JSON agar parsing selalu sukses
+        config: {
+          responseMimeType: "application/json",
+        },
       });
 
       const responseText = response.text || "";
@@ -109,8 +113,8 @@ export async function processReceiptImage(
       console.warn(`[Percobaan ${attempt} Gagal]: ${message}`);
 
       if (attempt < maxRetries) {
-        console.log("Menunggu 1.5 detik lalu retry otomatis...");
-        await delay(1500);
+        console.log("Menunggu 2 detik lalu retry otomatis...");
+        await delay(2000);
       }
     }
   }
