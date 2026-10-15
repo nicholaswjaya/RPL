@@ -10,6 +10,7 @@ export interface ScannedReceipt {
   items: ReceiptItem[];
   tax: number;
   service: number;
+  serviceRate: number;
   discount: number;
 }
 
@@ -36,11 +37,13 @@ export async function processReceiptImage(
         ],
         "tax": 0,
         "service": 0,
+        "serviceRate": 0,
         "discount": 0
       }
       Aturan:
       1. Properti "items" HARUS berupa Array berisi objek menu.
-      2. Jika pajak/service/diskon tidak ada, beri nilai 0.
+      2. "tax" dan "service" adalah nominal rupiah, sedangkan "serviceRate" adalah persentase service charge.
+      3. Jika pajak/service/diskon tidak ada, beri nilai 0.
       `;
 
     console.log("[MVP Feature 1] Memproses gambar struk dengan model gemini-3.8-flash...");
@@ -83,6 +86,9 @@ export async function processReceiptImage(
       }),
       tax: typeof parsedData.tax === "number" ? parsedData.tax : Number(parsedData.tax) || 0,
       service: typeof parsedData.service === "number" ? parsedData.service : Number(parsedData.service) || 0,
+      serviceRate: typeof parsedData.serviceRate === "number"
+        ? parsedData.serviceRate
+        : Number(parsedData.serviceRate) || 0,
       discount: typeof parsedData.discount === "number" ? parsedData.discount : Number(parsedData.discount) || 0,
     };
 
