@@ -56,7 +56,7 @@ Form dinamis untuk menambah, mengedit, atau menghapus item menu (Nama, Harga, Qt
 
 Fitur centang penanda menu Sharing? (makanan tengah).
 
-Kalkulasi otomatis Subtotal, Pajak (%), Service Fee (Rp), dan Diskon (Rp).
+Kalkulasi otomatis Subtotal, Pajak (%), Service Charge (%), dan Diskon (%), dengan nominal biaya dihitung dari subtotal.
 
 Pembagian Bill Interaktif (Split Bill Engine):
 

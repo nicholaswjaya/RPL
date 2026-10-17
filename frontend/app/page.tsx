@@ -2,19 +2,25 @@
 
 import { useState } from "react";
 import ManualInputForm, { BillData, Item } from "../components/ManualInputForm";
+import ScannedReceiptReview from "../components/ScannedReceiptReview";
 import SplitBillSection from "../components/SplitBillSection";
 
 interface ScanResponse {
   items?: Item[];
   tax?: number;
   service?: number;
+  serviceRate?: number;
   discount?: number;
+  discountRate?: number;
   error?: string;
 }
 
 export default function Home() {
   const [mode, setMode] = useState<"ai" | "manual">("manual");
   const [billData, setBillData] = useState<BillData | null>(null);
+  const [scannedBillData, setScannedBillData] = useState<{
+    billData: BillData;
+  } | null>(null);
   const [loadingAI, setLoadingAI] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
 
@@ -60,13 +66,29 @@ export default function Home() {
       const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
       const taxAmount = typeof data.tax === "number" ? data.tax : 0;
       const taxRate = subtotal > 0 ? (taxAmount / subtotal) * 100 : 0;
+      const service = typeof data.service === "number" ? data.service : 0;
+      const serviceRate =
+        typeof data.serviceRate === "number" && data.serviceRate > 0
+          ? data.serviceRate
+          : subtotal > 0
+            ? (service / subtotal) * 100
+            : 0;
+      const discount = typeof data.discount === "number" ? data.discount : 0;
+      const discountRate =
+        typeof data.discountRate === "number"
+          ? data.discountRate
+          : subtotal > 0
+            ? (discount / subtotal) * 100
+            : 0;
 
-      handleDataReady({
-        items,
-        taxRate,
-        taxAmount,
-        service: data.service || 0,
-        discount: data.discount || 0,
+      setScannedBillData({
+        billData: {
+          items,
+          taxRate,
+          taxAmount,
+          serviceRate,
+          discountRate,
+        },
       });
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Gagal memproses AI");
@@ -79,7 +101,21 @@ export default function Home() {
     <main className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-extrabold text-center text-blue-600 mb-6">Patungin App</h1>
 
-      {!billData ? (
+      {billData ? (
+        <SplitBillSection
+          billData={billData}
+          onReset={() => {
+            setBillData(null);
+            setScannedBillData(null);
+          }}
+        />
+      ) : scannedBillData ? (
+        <ScannedReceiptReview
+          billData={scannedBillData.billData}
+          onConfirm={handleDataReady}
+          onBack={() => setScannedBillData(null)}
+        />
+      ) : (
         <>
           {/* Navigasi Toggle Scan AI / Input Manual */}
           <div className="max-w-md mx-auto mb-6 flex bg-gray-200 p-1 rounded-xl">
@@ -126,9 +162,6 @@ export default function Home() {
             </div>
           )}
         </>
-      ) : (
-        /* Halaman Pembagian Bill per Orang */
-        <SplitBillSection billData={billData} onReset={() => setBillData(null)} />
       )}
     </main>
   );
