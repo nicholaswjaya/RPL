@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { BillData } from "./ManualInputForm";
+import {
+  formatPercentageRate,
+  parsePercentageInput,
+  roundRateUpToTenth,
+  sanitizePercentageInput,
+} from "../lib/split";
 
 interface Props {
   billData: BillData;
@@ -15,22 +21,28 @@ export default function ScannedReceiptReview({
   onBack,
 }: Props) {
   const subtotal = billData.items.reduce((total, item) => total + item.price * item.qty, 0);
-  const [taxRate, setTaxRate] = useState(billData.taxRate);
-  const [serviceRate, setServiceRate] = useState(billData.serviceRate);
-  const [discountRate, setDiscountRate] = useState(billData.discountRate);
-  const taxAmount = Math.round((subtotal * taxRate) / 100);
-  const serviceAmount = Math.round((subtotal * serviceRate) / 100);
-  const discountAmount = Math.round((subtotal * discountRate) / 100);
+  const [taxRate, setTaxRate] = useState(formatPercentageRate(billData.taxRate));
+  const [serviceRate, setServiceRate] = useState(formatPercentageRate(billData.serviceRate));
+  const [discountRate, setDiscountRate] = useState(formatPercentageRate(billData.discountRate));
+  const taxRateValue = parsePercentageInput(taxRate);
+  const serviceRateValue = parsePercentageInput(serviceRate);
+  const discountRateValue = parsePercentageInput(discountRate);
+  const taxAmount = Math.round((subtotal * roundRateUpToTenth(taxRateValue)) / 100);
+  const serviceAmount = Math.round((subtotal * roundRateUpToTenth(serviceRateValue)) / 100);
+  const discountAmount = Math.round((subtotal * roundRateUpToTenth(discountRateValue)) / 100);
   const grandTotal = subtotal + taxAmount + serviceAmount - discountAmount;
 
   const handleConfirm = (event: React.FormEvent) => {
     event.preventDefault();
+    const roundedTaxRate = roundRateUpToTenth(taxRateValue);
+    const roundedServiceRate = roundRateUpToTenth(serviceRateValue);
+    const roundedDiscountRate = roundRateUpToTenth(discountRateValue);
     onConfirm({
       ...billData,
-      taxRate,
-      taxAmount,
-      serviceRate,
-      discountRate,
+      taxRate: roundedTaxRate,
+      taxAmount: Math.round((subtotal * roundedTaxRate) / 100),
+      serviceRate: roundedServiceRate,
+      discountRate: roundedDiscountRate,
     });
   };
 
@@ -53,11 +65,12 @@ export default function ScannedReceiptReview({
             </label>
             <input
               id="scanned-tax-rate"
-              type="number"
-              min="0"
-              step="0.01"
-              value={taxRate || ""}
-              onChange={(event) => setTaxRate(Number(event.target.value))}
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
+              value={taxRate}
+              onChange={(event) => setTaxRate(sanitizePercentageInput(event.target.value))}
+              onBlur={() => setTaxRate(formatPercentageRate(parsePercentageInput(taxRate)))}
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -71,11 +84,12 @@ export default function ScannedReceiptReview({
             </label>
             <input
               id="scanned-service-rate"
-              type="number"
-              min="0"
-              step="0.01"
-              value={serviceRate || ""}
-              onChange={(event) => setServiceRate(Number(event.target.value))}
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
+              value={serviceRate}
+              onChange={(event) => setServiceRate(sanitizePercentageInput(event.target.value))}
+              onBlur={() => setServiceRate(formatPercentageRate(parsePercentageInput(serviceRate)))}
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -89,11 +103,12 @@ export default function ScannedReceiptReview({
             </label>
             <input
               id="scanned-discount-rate"
-              type="number"
-              min="0"
-              step="0.01"
-              value={discountRate || ""}
-              onChange={(event) => setDiscountRate(Number(event.target.value))}
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
+              value={discountRate}
+              onChange={(event) => setDiscountRate(sanitizePercentageInput(event.target.value))}
+              onBlur={() => setDiscountRate(formatPercentageRate(parsePercentageInput(discountRate)))}
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import ManualInputForm, { BillData, Item } from "../components/ManualInputForm";
 import ScannedReceiptReview from "../components/ScannedReceiptReview";
 import SplitBillSection from "../components/SplitBillSection";
+import { roundRateUpToTenth } from "../lib/split";
 
 interface ScanResponse {
   items?: Item[];
@@ -65,21 +66,23 @@ export default function Home() {
       }));
       const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
       const taxAmount = typeof data.tax === "number" ? data.tax : 0;
-      const taxRate = subtotal > 0 ? (taxAmount / subtotal) * 100 : 0;
+      const taxRate = roundRateUpToTenth(subtotal > 0 ? (taxAmount / subtotal) * 100 : 0);
       const service = typeof data.service === "number" ? data.service : 0;
-      const serviceRate =
+      const serviceRate = roundRateUpToTenth(
         typeof data.serviceRate === "number" && data.serviceRate > 0
           ? data.serviceRate
           : subtotal > 0
             ? (service / subtotal) * 100
-            : 0;
+            : 0
+      );
       const discount = typeof data.discount === "number" ? data.discount : 0;
-      const discountRate =
+      const discountRate = roundRateUpToTenth(
         typeof data.discountRate === "number"
           ? data.discountRate
           : subtotal > 0
             ? (discount / subtotal) * 100
-            : 0;
+            : 0
+      );
 
       setScannedBillData({
         billData: {

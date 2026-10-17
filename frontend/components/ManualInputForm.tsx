@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { calculateBillTotals } from "../lib/split";
+import {
+  calculateBillTotals,
+  formatPercentageRate,
+  parsePercentageInput,
+  roundRateUpToTenth,
+  sanitizePercentageInput,
+} from "../lib/split";
 
 export interface Item {
   name: string;
@@ -26,9 +32,12 @@ export default function ManualInputForm({ onSubmit }: Props) {
   const [items, setItems] = useState<Item[]>([
     { name: "", price: 0, qty: 1, isSharing: false },
   ]);
-  const [taxRate, setTaxRate] = useState<number>(10);
-  const [serviceRate, setServiceRate] = useState<number>(0);
-  const [discountRate, setDiscountRate] = useState<number>(0);
+  const [taxRate, setTaxRate] = useState("10");
+  const [serviceRate, setServiceRate] = useState("0");
+  const [discountRate, setDiscountRate] = useState("0");
+  const taxRateValue = parsePercentageInput(taxRate);
+  const serviceRateValue = parsePercentageInput(serviceRate);
+  const discountRateValue = parsePercentageInput(discountRate);
 
   const addItem = () => {
     setItems([...items, { name: "", price: 0, qty: 1, isSharing: false }]);
@@ -47,9 +56,9 @@ export default function ManualInputForm({ onSubmit }: Props) {
 
   const { subtotal, taxAmount, serviceAmount, discountAmount, grandTotal } = calculateBillTotals(
     items,
-    taxRate,
-    serviceRate,
-    discountRate
+    taxRateValue,
+    serviceRateValue,
+    discountRateValue
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,7 +67,13 @@ export default function ManualInputForm({ onSubmit }: Props) {
       alert("Mohon isi nama menu dan harga dengan benar!");
       return;
     }
-    onSubmit({ items, taxRate, taxAmount, serviceRate, discountRate });
+    onSubmit({
+      items,
+      taxRate: roundRateUpToTenth(taxRateValue),
+      taxAmount,
+      serviceRate: roundRateUpToTenth(serviceRateValue),
+      discountRate: roundRateUpToTenth(discountRateValue),
+    });
   };
 
   return (
@@ -138,35 +153,39 @@ export default function ManualInputForm({ onSubmit }: Props) {
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Pajak (%)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
               value={taxRate}
-              onChange={(e) => setTaxRate(Number(e.target.value))}
+              onChange={(e) => setTaxRate(sanitizePercentageInput(e.target.value))}
+              onBlur={() => setTaxRate(formatPercentageRate(parsePercentageInput(taxRate)))}
               placeholder="10"
-              min="0"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Service Charge (%)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
               value={serviceRate || ""}
-              onChange={(e) => setServiceRate(Number(e.target.value))}
+              onChange={(e) => setServiceRate(sanitizePercentageInput(e.target.value))}
+              onBlur={() => setServiceRate(formatPercentageRate(parsePercentageInput(serviceRate)))}
               placeholder="0"
-              min="0"
-              step="0.01"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Diskon (%)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="decimal"
+              maxLength={5}
               value={discountRate || ""}
-              onChange={(e) => setDiscountRate(Number(e.target.value))}
+              onChange={(e) => setDiscountRate(sanitizePercentageInput(e.target.value))}
+              onBlur={() => setDiscountRate(formatPercentageRate(parsePercentageInput(discountRate)))}
               placeholder="0"
-              min="0"
-              step="0.01"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -178,15 +197,15 @@ export default function ManualInputForm({ onSubmit }: Props) {
             <span>Rp {subtotal.toLocaleString("id-ID")}</span>
           </div>
           <div className="flex justify-between text-gray-600">
-            <span>Pajak ({taxRate}%):</span>
+            <span>Pajak ({roundRateUpToTenth(taxRateValue)}%):</span>
             <span>Rp {taxAmount.toLocaleString("id-ID")}</span>
           </div>
           <div className="flex justify-between text-gray-600">
-            <span>Service charge ({serviceRate}%):</span>
+            <span>Service charge ({roundRateUpToTenth(serviceRateValue)}%):</span>
             <span>Rp {serviceAmount.toLocaleString("id-ID")}</span>
           </div>
           <div className="flex justify-between text-gray-600">
-            <span>Diskon ({discountRate}%):</span>
+            <span>Diskon ({roundRateUpToTenth(discountRateValue)}%):</span>
             <span>- Rp {discountAmount.toLocaleString("id-ID")}</span>
           </div>
           <div className="flex justify-between font-bold text-base text-gray-800 pt-2 border-t">

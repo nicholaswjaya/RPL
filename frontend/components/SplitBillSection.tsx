@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { BillData } from "./ManualInputForm";
+import { roundRateUpToTenth } from "../lib/split";
 
 interface PersonAssignment {
   name: string;
@@ -41,8 +42,8 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   // Hitung multiplier Pajak/Service/Diskon
   const rawSubtotal = billData.items.reduce((acc, item) => acc + item.price * item.qty, 0);
   const taxAmount = typeof billData.taxAmount === "number" ? billData.taxAmount : (rawSubtotal * (billData.taxRate || 0)) / 100;
-  const serviceAmount = Math.round((rawSubtotal * billData.serviceRate) / 100);
-  const discountAmount = Math.round((rawSubtotal * billData.discountRate) / 100);
+  const serviceAmount = Math.round((rawSubtotal * roundRateUpToTenth(billData.serviceRate)) / 100);
+  const discountAmount = Math.round((rawSubtotal * roundRateUpToTenth(billData.discountRate)) / 100);
   const netTotal = rawSubtotal + taxAmount + serviceAmount - discountAmount;
   const multiplier = rawSubtotal > 0 ? netTotal / rawSubtotal : 1;
 
