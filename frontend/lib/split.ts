@@ -5,25 +5,29 @@ interface BillItem {
 
 export function roundRateUpToTenth(rate: number) {
   if (!Number.isFinite(rate)) return 0;
-  const boundedRate = Math.min(Math.max(rate, 0), 999.9);
+  const boundedRate = Math.min(Math.max(rate, 0), 100);
   if (boundedRate === 0) return 0;
   return Math.ceil(boundedRate * 10 - 1e-10) / 10;
 }
 
 export function limitPercentageInput(rate: number) {
   if (!Number.isFinite(rate)) return 0;
-  return Math.min(Math.max(rate, 0), 999.9);
+  return Math.min(Math.max(rate, 0), 100);
 }
 
 export function sanitizePercentageInput(value: string) {
   const normalized = value.replace(/\./g, ",").replace(/[^\d,]/g, "");
   const separatorIndex = normalized.indexOf(",");
 
-  if (separatorIndex < 0) return normalized.slice(0, 3);
+  if (separatorIndex < 0) {
+    const integerPart = normalized.slice(0, 3);
+    return Number(integerPart) > 100 ? "100" : integerPart;
+  }
 
   const integerPart = normalized.slice(0, separatorIndex).slice(0, 3);
   const decimalPart = normalized.slice(separatorIndex + 1).replace(/,/g, "").slice(0, 1);
-  return `${integerPart},${decimalPart}`;
+  const sanitized = `${integerPart},${decimalPart}`;
+  return Number(sanitized.replace(",", ".")) > 100 ? "100" : sanitized;
 }
 
 export function parsePercentageInput(value: string) {

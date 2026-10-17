@@ -12,25 +12,27 @@ describe("calculateBillTotals", () => {
   it("membulatkan persentase selalu ke atas ke satu angka desimal", () => {
     expect(roundRateUpToTenth(10.23)).toBe(10.3);
     expect(roundRateUpToTenth(10.2)).toBe(10.2);
-    expect(roundRateUpToTenth(100.23)).toBe(100.3);
-    expect(roundRateUpToTenth(1000)).toBe(999.9);
+    expect(roundRateUpToTenth(100.23)).toBe(100);
+    expect(roundRateUpToTenth(1000)).toBe(100);
     expect(roundRateUpToTenth(-1)).toBe(0);
     expect(roundRateUpToTenth(Number.NaN)).toBe(0);
   });
 
   it("membatasi input persentase ke rentang yang didukung", () => {
-    expect(limitPercentageInput(100.5)).toBe(100.5);
-    expect(limitPercentageInput(1000)).toBe(999.9);
+    expect(limitPercentageInput(100.5)).toBe(100);
+    expect(limitPercentageInput(1000)).toBe(100);
     expect(limitPercentageInput(-0.5)).toBe(0);
     expect(limitPercentageInput(23.4)).toBe(23.4);
   });
 
-  it("membatasi teks input ke tiga digit dan satu desimal", () => {
-    expect(sanitizePercentageInput("100,1")).toBe("100,1");
-    expect(sanitizePercentageInput("1234,56")).toBe("123,5");
+  it("membatasi teks input ke 100 dengan maksimal satu desimal", () => {
+    expect(sanitizePercentageInput("12,56")).toBe("12,5");
+    expect(sanitizePercentageInput("1234,56")).toBe("100");
     expect(sanitizePercentageInput("10.23")).toBe("10,2");
-    expect(parsePercentageInput("100,1")).toBe(100.1);
-    expect(formatPercentageRate(100.1)).toBe("100,1");
+    expect(sanitizePercentageInput("101")).toBe("100");
+    expect(sanitizePercentageInput("100,1")).toBe("100");
+    expect(parsePercentageInput("100,1")).toBe(100);
+    expect(formatPercentageRate(100.1)).toBe("100,0");
   });
 
   it("menghitung service charge dan diskon berdasarkan persentase subtotal", () => {

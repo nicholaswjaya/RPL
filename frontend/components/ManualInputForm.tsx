@@ -160,6 +160,7 @@ export default function ManualInputForm({ onSubmit }: Props) {
               onChange={(e) => setTaxRate(sanitizePercentageInput(e.target.value))}
               onBlur={() => setTaxRate(formatPercentageRate(parsePercentageInput(taxRate)))}
               placeholder="10"
+              aria-label="Pajak, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -173,6 +174,7 @@ export default function ManualInputForm({ onSubmit }: Props) {
               onChange={(e) => setServiceRate(sanitizePercentageInput(e.target.value))}
               onBlur={() => setServiceRate(formatPercentageRate(parsePercentageInput(serviceRate)))}
               placeholder="0"
+              aria-label="Service charge, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -186,6 +188,7 @@ export default function ManualInputForm({ onSubmit }: Props) {
               onChange={(e) => setDiscountRate(sanitizePercentageInput(e.target.value))}
               onBlur={() => setDiscountRate(formatPercentageRate(parsePercentageInput(discountRate)))}
               placeholder="0"
+              aria-label="Diskon, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>

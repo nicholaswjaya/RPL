@@ -71,6 +71,7 @@ export default function ScannedReceiptReview({
               value={taxRate}
               onChange={(event) => setTaxRate(sanitizePercentageInput(event.target.value))}
               onBlur={() => setTaxRate(formatPercentageRate(parsePercentageInput(taxRate)))}
+              aria-label="Pajak, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -90,6 +91,7 @@ export default function ScannedReceiptReview({
               value={serviceRate}
               onChange={(event) => setServiceRate(sanitizePercentageInput(event.target.value))}
               onBlur={() => setServiceRate(formatPercentageRate(parsePercentageInput(serviceRate)))}
+              aria-label="Service charge, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
@@ -109,6 +111,7 @@ export default function ScannedReceiptReview({
               value={discountRate}
               onChange={(event) => setDiscountRate(sanitizePercentageInput(event.target.value))}
               onBlur={() => setDiscountRate(formatPercentageRate(parsePercentageInput(discountRate)))}
+              aria-label="Diskon, maksimal 100 persen"
               className="w-full p-2 border border-gray-300 rounded-lg text-sm"
             />
           </div>
