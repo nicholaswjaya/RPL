@@ -56,7 +56,7 @@ Form dinamis untuk menambah, mengedit, atau menghapus item menu (Nama, Harga, Qt
 
 Fitur centang penanda menu Sharing? (makanan tengah).
 
-Kalkulasi otomatis Subtotal, Pajak (%), Service Charge (%), dan Diskon (%), dengan nominal biaya dihitung dari subtotal.
+Kalkulasi otomatis Subtotal dan Pajak (%), serta Service Charge (Rp) dan Diskon (Rp) sebagai nominal tetap.
 
 Pembagian Bill Interaktif (Split Bill Engine):
 
@@ -97,3 +97,35 @@ Ketepatan Kalkulasi Manual: Form manual mampu menghitung Subtotal, Pajak persent
 Pemisahan Menu Sharing yang Presisi: Pembagian menu sharing (misal Pizza Rp 200.000 dibagi 3 orang = Rp 66.667/orang) dihitung secara adil dan ditambah proporsi pajak secara pas.
 
 Respon Tampilan (UX & Responsive): Antarmuka responsif digunakan dengan baik di layar ponsel (mobile-friendly) dan desktop tanpa terjadi error Module not found atau Syntax error pada build produksi Next.js.
+
+7. User Story & Acceptance Criteria MVP
+
+1. **Input struk secara manual** — Sebagai host, saya ingin menambah, mengubah, dan menghapus menu beserta harga, kuantitas, dan penanda sharing agar tetap dapat membuat bill ketika scan tidak tersedia.
+   - Host dapat menambah dan menghapus baris menu; baris terakhir tidak dapat dihapus.
+   - Host harus mengisi nama, harga lebih dari Rp 0, dan kuantitas minimal 1 sebelum bill disimpan.
+   - Subtotal, pajak (persentase), service (nominal rupiah), diskon (nominal rupiah), dan total akhir diperbarui dari input; total akhir tidak pernah negatif.
+   - Test: `frontend/__tests__/billCalculation.test.ts`.
+
+2. **Scan struk otomatis** — Sebagai host, saya ingin mengunggah foto struk agar menu, harga, kuantitas, pajak, service, dan diskon dapat dibaca otomatis tanpa mengetik ulang.
+   - Foto yang dipilih dikirim ke endpoint `/api/scan` dan hasil AI dengan daftar item valid diteruskan ke proses split bill.
+   - Hasil scan dinormalisasi: harga dan kuantitas tidak valid dibersihkan, nama kosong diberi nama pengganti, dan nilai biaya yang tidak tersedia menjadi nol.
+   - Jika scan gagal atau layanan AI tidak tersedia, pengguna menerima pesan error dan aplikasi tidak berpindah ke hasil bill palsu.
+   - Test: `frontend/__tests__/receiptNormalizer.test.ts`; alur layanan AI dijalankan pada build aplikasi.
+
+3. **Alokasi menu personal** — Sebagai host, saya ingin mengalokasikan kuantitas menu personal ke anggota agar porsi setiap orang tercatat dan tidak dialokasikan melebihi pesanan.
+   - Sisa kuantitas menu personal dimulai dari kuantitas pada struk dan tidak dapat dikurangi di bawah nol.
+   - Host hanya dapat menyimpan anggota dengan nama dan sedikitnya satu menu terpilih.
+   - Menghapus anggota mengembalikan porsi menu personalnya ke pool.
+   - Test: `frontend/__tests__/poolValidator.test.ts`.
+
+4. **Pembagian menu sharing** — Sebagai host, saya ingin menandai anggota yang ikut makan menu sharing agar biaya menu dibagi berdasarkan jumlah orang yang memilihnya.
+   - Biaya sharing per orang adalah harga dikali kuantitas dibagi jumlah eater pada menu tersebut.
+   - Menu sharing tanpa eater ditandai belum terbagi; pembagian dengan nol eater tidak menghasilkan `NaN` atau `Infinity`.
+   - Test: `frontend/__tests__/sharingSplitter.test.ts`.
+
+5. **Ringkasan tagihan per anggota** — Sebagai host dan anggota, saya ingin melihat rincian tagihan per orang dengan beban pajak, service, dan diskon secara proporsional agar nominal yang dibayar transparan.
+   - Setiap orang menanggung subtotal menu personal dan porsi sharing yang dipilih, lalu totalnya dikalikan faktor total bill terhadap subtotal struk.
+   - Total per orang dibulatkan ke rupiah terdekat dan aplikasi menampilkan apakah alokasi sudah seimbang dengan total struk.
+   - Test: `frontend/__tests__/personBilling.test.ts` dan `frontend/__tests__/billCalculation.test.ts`.
+
+Jalankan seluruh unit test dengan `npm test`. Test berada di `frontend/__tests__/`; saat ini terdapat enam file test untuk aturan kalkulasi, normalisasi struk, alokasi menu, sharing, tagihan anggota, dan fungsi kompatibilitas kalkulasi lama.
