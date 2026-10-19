@@ -80,7 +80,7 @@ export function formatWhatsAppSummary(
   grandTotal: number
 ): string {
   const lines: string[] = [
-    "🧾 *Rincian Pembagian Tagihan (Patungin)*",
+    "🧾 *Rincian Pembagian Tagihan (BagiDeh)*",
     "----------------------------------------",
   ];
 

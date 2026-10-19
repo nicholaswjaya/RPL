@@ -1,5 +1,5 @@
 ================================================================================
-ALIRAN DATA (DATA FLOW) DAN PERAN KOMPONEN APLIKASI PATUNGIN
+ALIRAN DATA (DATA FLOW) DAN PERAN KOMPONEN APLIKASI BAGIDEH
 ================================================================================
 
 1. ALIRAN DATA (DATA FLOW)

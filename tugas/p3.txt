@@ -1,4 +1,4 @@
-Build a simple full-stack web application named **Patungin**.
+Build a simple full-stack web application named **BagiDeh**.
 Purpose:
 Help groups of friends, students, or colleagues scan/input restaurant receipts, calculate total expenses including proportional tax, service fees, and discounts, and split bills accurately—supporting both single-item assignments and shared-item cost allocation.
 
@@ -142,7 +142,7 @@ Project structure:
 * Structure:
 
 ```text
-patungin_app/
+bagideh_app/
   app/
     api/
       scan/

@@ -63,7 +63,7 @@ export default function Home() {
     <main className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <div className="max-w-2xl mx-auto mb-6 text-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-600 tracking-tight">
-          Patungin App
+          BagiDeh
         </h1>
         <p className="text-sm text-gray-600 mt-1">
           Kalkulator & Pemisah Tagihan Struk Otomatis (Split Bill Cepat & Adil)

@@ -1,21 +1,21 @@
 Nama/Judul Aplikasi
 
-Patungin — Aplikasi Calculators & Bill Splitter Otomatis
+BagiDeh — Aplikasi Calculators & Bill Splitter Otomatis
 Beberapa pilihan nama yang dipertimbangkan:
 
-Patungin — Platform Split Bill & Kalkulator Struk Otomatis
+BagiDeh — Platform Split Bill & Kalkulator Struk Otomatis
 
-PatunginApp — Aplikasi Hitung Patungan & Scan Struk
+BagiDehApp — Aplikasi Hitung Patungan & Scan Struk
 
-PatunginYuk — Sistem Manajemen Split Bill & Nota Restoran
+BagiDehYuk — Sistem Manajemen Split Bill & Nota Restoran
 
-Patungin — Fast & Fair Receipt Splitter
+BagiDeh — Fast & Fair Receipt Splitter
 
 Ide Utama Aplikasi
 
-Patungin adalah aplikasi web-based yang digunakan oleh kelompok teman, mahasiswa, atau rekan kerja untuk menghitung, membagi, dan mengelola pembagian tagihan (bill splitting) makan/belanja secara presisi dan transparan.
+BagiDeh adalah aplikasi web-based yang digunakan oleh kelompok teman, mahasiswa, atau rekan kerja untuk menghitung, membagi, dan mengelola pembagian tagihan (bill splitting) makan/belanja secara presisi dan transparan.
 Contoh Kasus: Budi, Ani, dan Dedi makan bersama di restoran.
-Budi membuka Patungin → memilih Scan Struk AI (upload foto nota) atau Input Manual → mengisi data menu:
+Budi membuka BagiDeh → memilih Scan Struk AI (upload foto nota) atau Input Manual → mengisi data menu:
 
 Pizza Meat Lover (1x - Rp 200.000) → Tandai: Sharing
 
@@ -34,7 +34,7 @@ Ani: Mengambil Es Teh (1x) & centang Pizza (Sharing).
 
 Dedi: Mengambil Es Teh (1x) & centang Pizza (Sharing).
 
-Sistem Patungin secara otomatis membagi harga Pizza ($200.000 / 3 = Rp 66.667) serta mengalkulasikan persentase pajak (10%) secara proporsional ke tagihan masing-masing orang secara real-time.
+BagiDeh secara otomatis membagi harga Pizza ($200.000 / 3 = Rp 66.667) serta mengalkulasikan persentase pajak (10%) secara proporsional ke tagihan masing-masing orang secara real-time.
 
 Deskripsi Masalah
 
@@ -62,7 +62,7 @@ Masalah 5 — Proses Input Manual yang Memakan Waktu: Memasukkan belasan daftar 
 
 Rumusan Masalah
 
-Dari masalah tersebut, rumusan masalah untuk proyek Patungin adalah:
+Dari masalah tersebut, rumusan masalah untuk proyek BagiDeh adalah:
 
 Bagaimana menyediakan sistem kalkulasi split bill yang mampu memproses ekstrak data struk secara otomatis menggunakan kecerdasan buatan (AI Vision)?
 
@@ -76,7 +76,7 @@ Bagaimana menyajikan rincian tagihan bersih per orang yang transparan dan mudah 
 
 Target Pengguna
 
-Target pengguna Patungin difokuskan pada 2 peran utama agar pengerjaan proyek sistem terarah dan realistis:
+Target pengguna BagiDeh difokuskan pada 2 peran utama agar pengerjaan proyek sistem terarah dan realistis:
 
 A. User / Pembuat Bill (Host)
 User dapat:

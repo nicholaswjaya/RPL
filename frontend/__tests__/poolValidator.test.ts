@@ -97,7 +97,7 @@ describe("poolValidator - Aturan Bisnis Pelacakan Sisa Porsi & Validasi Keterbag
 
     const message = formatWhatsAppSummary(peopleData, grandTotal);
 
-    expect(message).toContain("🧾 *Rincian Pembagian Tagihan (Patungin)*");
+    expect(message).toContain("🧾 *Rincian Pembagian Tagihan (BagiDeh)*");
     expect(message).toContain("👤 *Budi*: Rp 45.000");
     expect(message).toContain("Nasi Goreng (1x): Rp 30.000");
     expect(message).toContain("🍕 Pizza (Sharing 1/3): Rp 15.000");

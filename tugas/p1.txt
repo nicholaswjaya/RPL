@@ -1,4 +1,4 @@
-ALTERNATIF 1: Patungin — Platform Split Bill & Kalkulator Struk Otomatis (Rekomendasi Utama)
+ALTERNATIF 1: BagiDeh — Platform Split Bill & Kalkulator Struk Otomatis (Rekomendasi Utama)
 1. Deskripsi Masalah
 Saat makan bersama di restoran atau kafe, kelompok mahasiswa atau rekan kerja sering kesulitan dalam membagi tagihan (split bill) dari nota/struk pembayaran fisik. Proses penghitungan manual menimbulkan beberapa masalah nyata:
 
