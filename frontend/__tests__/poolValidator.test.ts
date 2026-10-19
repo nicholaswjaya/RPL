@@ -88,19 +88,41 @@ describe("poolValidator - Aturan Bisnis Pelacakan Sisa Porsi & Validasi Keterbag
     const peopleData = [
       {
         name: "Budi",
-        totalWithTax: 45000,
-        assignedItems: [{ name: "Nasi Goreng", qty: 1, price: 30000 }],
-        sharingItemsNames: [{ name: "Pizza", eaters: 3, cost: 15000 }],
+        totalWithTax: 12000,
+        assignedItems: [
+          { name: "Es Teh", qty: 1, price: 2000 },
+          { name: "Nasi Goreng", qty: 1, price: 10000 },
+        ],
+        sharingItemsNames: [],
       },
     ];
-    const grandTotal = 45000;
+    const grandTotal = 12000;
 
     const message = formatWhatsAppSummary(peopleData, grandTotal);
 
     expect(message).toContain("🧾 *Rincian Pembagian Tagihan (BagiDeh)*");
-    expect(message).toContain("👤 *Budi*: Rp 45.000");
-    expect(message).toContain("Nasi Goreng (1x): Rp 30.000");
+    expect(message).toContain("👤 *Budi*");
+    expect(message).toContain("Es Teh (1x): Rp 2.000");
+    expect(message).toContain("Nasi Goreng (1x): Rp 10.000");
+    expect(message).toContain("*Total Budi*: Rp 12.000");
+    expect(message).toContain("💰 *Total Keseluruhan Bill*: Rp 12.000");
+  });
+
+  it("menampilkan biaya menu sharing per orang", () => {
+    const message = formatWhatsAppSummary(
+      [
+        {
+          name: "Ani",
+          totalWithTax: 15000,
+          assignedItems: [],
+          sharingItemsNames: [{ name: "Pizza", eaters: 3, cost: 15000 }],
+        },
+      ],
+      15000
+    );
+
     expect(message).toContain("🍕 Pizza (Sharing 1/3): Rp 15.000");
-    expect(message).toContain("💰 *Grand Total*: Rp 45.000");
+    expect(message).toContain("*Total Ani*: Rp 15.000");
+    expect(message).toContain("💰 *Total Keseluruhan Bill*: Rp 15.000");
   });
 });

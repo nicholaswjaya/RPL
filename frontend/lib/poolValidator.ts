@@ -88,7 +88,7 @@ export function formatWhatsAppSummary(
     lines.push("Belum ada anggota yang ditambahkan.");
   } else {
     people.forEach((p) => {
-      lines.push(`👤 *${p.name}*: Rp ${p.totalWithTax.toLocaleString("id-ID")}`);
+      lines.push(`👤 *${p.name}*`);
 
       p.assignedItems.forEach((item) => {
         lines.push(`   - ${item.name} (${item.qty}x): Rp ${(item.price * item.qty).toLocaleString("id-ID")}`);
@@ -98,12 +98,13 @@ export function formatWhatsAppSummary(
         lines.push(`   - 🍕 ${s.name} (Sharing 1/${s.eaters}): Rp ${Math.round(s.cost).toLocaleString("id-ID")}`);
       });
 
+      lines.push(`   *Total ${p.name}*: Rp ${p.totalWithTax.toLocaleString("id-ID")}`);
       lines.push("");
     });
   }
 
   lines.push("----------------------------------------");
-  lines.push(`💰 *Grand Total*: Rp ${grandTotal.toLocaleString("id-ID")}`);
+  lines.push(`💰 *Total Keseluruhan Bill*: Rp ${grandTotal.toLocaleString("id-ID")}`);
   lines.push("*Sudah termasuk pajak & biaya layanan proporsional.*");
   lines.push("Yuk segera bayar patungannya ya! 🙏");
 
