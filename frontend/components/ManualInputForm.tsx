@@ -98,13 +98,13 @@ export default function ManualInputForm({ initialData, onSubmit }: Props) {
 
       {errorMessage && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center justify-between">
-          <span>⚠️ {errorMessage}</span>
+          <span>{errorMessage}</span>
           <button
             type="button"
             onClick={() => setErrorMessage(null)}
             className="text-red-500 font-bold hover:text-red-700 ml-2"
           >
-            ✕
+            Tutup
           </button>
         </div>
       )}
@@ -172,7 +172,7 @@ export default function ManualInputForm({ initialData, onSubmit }: Props) {
                   className="p-1 text-red-500 hover:text-red-700 font-bold"
                   title="Hapus baris menu"
                 >
-                  ✕
+                  Hapus
                 </button>
               )}
             </div>

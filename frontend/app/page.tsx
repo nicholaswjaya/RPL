@@ -83,7 +83,7 @@ export default function Home() {
                 mode === "manual" ? "bg-white shadow text-blue-600" : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              ✍️ Input Manual
+              Input Manual
             </button>
             <button
               onClick={() => {
@@ -94,7 +94,7 @@ export default function Home() {
                 mode === "ai" ? "bg-white shadow text-blue-600" : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              📸 Scan AI Struk
+              Scan AI Struk
             </button>
           </div>
 
@@ -106,9 +106,6 @@ export default function Home() {
           {/* Form Upload Scan AI */}
           {mode === "ai" && (
             <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md border border-gray-100 text-center">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                📷
-              </div>
               <h2 className="text-xl font-bold mb-1 text-gray-800">Scan Struk Pakai AI</h2>
               <p className="text-xs text-gray-500 mb-4">
                 Unggah foto struk restoran/kafe Anda, AI akan mengekstrak menu, harga, dan pajak otomatis.
@@ -116,7 +113,7 @@ export default function Home() {
 
               {scanError && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 text-left">
-                  ⚠️ {scanError}
+                  {scanError}
                 </div>
               )}
 
@@ -137,10 +134,7 @@ export default function Home() {
                   className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loadingAI ? (
-                    <>
-                      <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                      <span>Sedang Menganalisis Struk...</span>
-                    </>
+                    <span>Sedang Menganalisis Struk...</span>
                   ) : (
                     <span>Mulai Scan Struk</span>
                   )}

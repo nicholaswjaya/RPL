@@ -100,12 +100,12 @@ describe("poolValidator - Aturan Bisnis Pelacakan Sisa Porsi & Validasi Keterbag
 
     const message = formatWhatsAppSummary(peopleData, grandTotal);
 
-    expect(message).toContain("🧾 *Rincian Pembagian Tagihan (BagiDeh)*");
-    expect(message).toContain("👤 *Budi*");
+    expect(message).toContain("*Rincian Pembagian Tagihan (BagiDeh)*");
+    expect(message).toContain("*Budi*");
     expect(message).toContain("Es Teh (1x): Rp 2.000");
     expect(message).toContain("Nasi Goreng (1x): Rp 10.000");
     expect(message).toContain("*Total Budi*: Rp 12.000");
-    expect(message).toContain("💰 *Total Keseluruhan Bill*: Rp 12.000");
+    expect(message).toContain("*Total Keseluruhan Bill*: Rp 12.000");
   });
 
   it("menampilkan biaya menu sharing per orang", () => {
@@ -121,8 +121,8 @@ describe("poolValidator - Aturan Bisnis Pelacakan Sisa Porsi & Validasi Keterbag
       15000
     );
 
-    expect(message).toContain("🍕 Pizza (Sharing 1/3): Rp 15.000");
+    expect(message).toContain("Pizza (Sharing 1/3): Rp 15.000");
     expect(message).toContain("*Total Ani*: Rp 15.000");
-    expect(message).toContain("💰 *Total Keseluruhan Bill*: Rp 15.000");
+    expect(message).toContain("*Total Keseluruhan Bill*: Rp 15.000");
   });
 });

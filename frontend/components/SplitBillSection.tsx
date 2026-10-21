@@ -224,8 +224,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
       >
         <div className="text-sm">
           {poolValidation.isFullyAllocated ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg">✅</span>
+            <div>
               <div>
                 <p className="font-bold">Semua menu struk sudah habis terbagi rata!</p>
                 <p className="text-xs text-green-700">
@@ -234,8 +233,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
               </div>
             </div>
           ) : (
-            <div className="flex items-start gap-2">
-              <span className="text-lg">⚠️</span>
+            <div>
               <div>
                 <p className="font-bold">Perhatian: Masih ada menu yang belum selesai dibagi!</p>
                 {poolValidation.unassignedItems.length > 0 && (
@@ -286,12 +284,12 @@ export default function SplitBillSection({ billData, onReset }: Props) {
 
         {inputError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex justify-between items-center">
-            <span>⚠️ {inputError}</span>
+            <span>{inputError}</span>
             <button
               onClick={() => setInputError(null)}
               className="font-bold text-red-500 hover:text-red-700 ml-2"
             >
-              ✕
+              Tutup
             </button>
           </div>
         )}
@@ -398,7 +396,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                         />
                         <div>
-                          <span className="text-gray-800">🍕 {item.name}</span>
+                          <span className="text-gray-800">{item.name}</span>
                           <span className="text-xs text-gray-500 block">
                             Total: Rp {totalSharingPrice.toLocaleString("id-ID")} ({item.qty}x)
                           </span>
@@ -437,7 +435,6 @@ export default function SplitBillSection({ billData, onReset }: Props) {
               onClick={handleCopyWhatsApp}
               className="px-3 py-1.5 bg-green-600 text-white font-semibold text-xs rounded-lg hover:bg-green-700 transition flex items-center gap-1.5 shadow-sm"
             >
-              <span>📲</span>
               <span>{copiedToast ? "Tersalin!" : "Salin ke WhatsApp"}</span>
             </button>
           )}
@@ -445,7 +442,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
 
         {copiedToast && (
           <div className="p-2.5 bg-green-100 border border-green-300 rounded-lg text-xs text-green-800 text-center font-medium">
-            ✓ Format teks WhatsApp berhasil disalin ke clipboard! Siap di-paste ke grup chat.
+            Format teks WhatsApp berhasil disalin ke clipboard! Siap di-paste ke grup chat.
           </div>
         )}
 
@@ -494,7 +491,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                         key={`s-${itemIndex}`}
                         className="flex justify-between text-xs text-blue-900 bg-blue-100/60 px-2 py-1 rounded"
                       >
-                        <span>🍕 {item?.name} (Sharing 1/{eaters} orang)</span>
+                        <span>{item?.name} (Sharing 1/{eaters} orang)</span>
                         <span>Rp {Math.round(cost).toLocaleString("id-ID")}</span>
                       </div>
                     );
