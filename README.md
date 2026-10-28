@@ -129,3 +129,6 @@ Respon Tampilan (UX & Responsive): Antarmuka responsif digunakan dengan baik di 
    - Test: `frontend/__tests__/personBilling.test.ts` dan `frontend/__tests__/billCalculation.test.ts`.
 
 Jalankan seluruh unit test dengan `npm test`. Test berada di `frontend/__tests__/`; saat ini terdapat enam file test untuk aturan kalkulasi, normalisasi struk, alokasi menu, sharing, tagihan anggota, dan fungsi kompatibilitas kalkulasi lama.
+
+Link Video Demo:
+https://drive.google.com/drive/folders/1XyKSpJpzQY6BH5fif-hI82CyTltG2NzY?usp=sharing
