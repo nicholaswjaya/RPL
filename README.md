@@ -1,3 +1,24 @@
+# BagiDeh
+
+## Mulai cepat dari fresh clone
+
+Persyaratan: Git dan Node.js 22 LTS atau lebih baru.
+
+```powershell
+git clone https://github.com/nicholaswjaya/RPL.git
+cd RPL
+npm ci
+npm run dev
+```
+
+Buka [http://localhost:3000](http://localhost:3000). Input manual dan pembagian tagihan dapat digunakan tanpa API key. Untuk scan struk AI, buat `.env.local` di root repository:
+
+```dotenv
+GEMINI_API_KEY=isi_dengan_api_key_Gemini_Anda
+```
+
+Jangan commit file `.env.local` atau membagikan API key. [Video demo](https://drive.google.com/drive/folders/1XyKSpJpzQY6BH5fif-hI82CyTltG2NzY?usp=sharing).
+
 1. Deskripsi Masalah (Problem Statement)
 Saat makan bersama di restoran atau kafe, kelompok mahasiswa atau rekan kerja sering kesulitan dalam membagi tagihan (split bill) dari nota/struk pembayaran fisik. Proses penghitungan manual menimbulkan beberapa masalah nyata:
 
@@ -132,3 +153,54 @@ Jalankan seluruh unit test dengan `npm test`. Test berada di `frontend/__tests__
 
 Link Video Demo:
 https://drive.google.com/drive/folders/1XyKSpJpzQY6BH5fif-hI82CyTltG2NzY?usp=sharing
+
+## Instalasi, pengujian, dan deploy
+
+Semua perintah berikut dijalankan dari root repository. `npm ci` memasang versi persis dari `package-lock.json`; gunakan perintah ini untuk clone bersih dan jangan commit kredensial.
+
+```powershell
+npm ci
+npm run dev
+```
+
+Kunjungi `http://localhost:3000` untuk mencoba aplikasi. Input manual tidak memerlukan konfigurasi tambahan. Untuk memakai scan AI secara lokal, isi `GEMINI_API_KEY` di `.env.local`, lalu restart server development.
+
+Validasi sebelum pull request atau deploy:
+
+```powershell
+npm test
+npm run build
+npm start
+```
+
+`npm start` menjalankan hasil build produksi di `http://localhost:3000`; hentikan dengan `Ctrl+C`. GitHub Actions menjalankan instalasi terkunci, seluruh unit test, dan build pada setiap pull request ke `main` serta push ke `main`. Semua pemeriksaan tersebut harus lulus sebelum perubahan digabung.
+
+### Deploy ke Vercel
+
+1. Import repository `nicholaswjaya/RPL` ke Vercel dengan root directory repository.
+2. Pastikan project memakai Node.js 22 atau lebih baru. Konfigurasi build ada di `vercel.json`.
+3. Jika fitur scan AI diperlukan, tambahkan `GEMINI_API_KEY` pada Project Settings → Environment Variables untuk Preview dan Production. Jangan menaruh nilainya di kode, log, atau repository.
+4. Deploy. Integrasi Git Vercel dapat membuat Preview Deployment untuk pull request dan Production Deployment dari branch production yang dikonfigurasi. Setelah mengubah environment variable, jalankan ulang deployment.
+5. Uji halaman utama di URL deployment. Scan AI memerlukan API key; input manual tetap tersedia tanpanya.
+
+Deploy cloud tidak dijalankan dari lingkungan pengembangan ini karena tidak tersedia kredensial/akses project Vercel.
+
+## Log aman, penyebab error, dan perbaikan
+
+Log backend hanya mencatat tahap, jumlah percobaan, model, status, dan kode error; log tidak mencatat isi struk, API key, respons AI, atau pesan mentah provider. Contoh:
+
+```text
+[ReceiptScan] attempt failed { attempt: 2, maxRetries: 5, model: 'gemini-2.5-flash' }
+[API /api/scan] request failed { status: 503, code: 'RECEIPT_SCAN_FAILED' }
+```
+
+| Gejala | Kemungkinan penyebab | Tindakan |
+|---|---|---|
+| `GEMINI_API_KEY belum dikonfigurasi di .env.local` | API key belum disetel | Isi `.env.local` secara lokal atau atur environment variable di Vercel, lalu mulai ulang/redeploy. |
+| Scan gagal setelah beberapa percobaan (`503`) | Kuota, koneksi, layanan AI, atau format respons provider bermasalah | Periksa kuota/ketersediaan layanan dan koneksi, lalu coba lagi; gunakan input manual sementara. Jangan menyalin key atau isi struk ke log/tiket. |
+| `npm ci` gagal | Node/npm tidak kompatibel, jaringan registry terputus, atau lockfile tidak cocok | Gunakan Node.js 22+, periksa koneksi npm registry, dan pastikan `package-lock.json` sesuai dengan `package.json`. |
+| Build/deploy berhasil tetapi scan gagal | `GEMINI_API_KEY` tidak tersedia pada environment deployment yang aktif | Atur variable untuk Preview/Production yang sesuai dan redeploy. |
+
+## Hasil pemeriksaan keamanan
+
+Review kode aplikasi tidak menemukan kerentanan yang dapat dieksploitasi secara langsung. Namun, audit dependensi pada fresh clone menemukan advisori yang perlu ditindaklanjuti: `npm audit` melaporkan 16 temuan (10 moderate, 3 high, 3 critical), sedangkan `npm audit --omit=dev` melaporkan 3 temuan production (2 high, 1 critical) pada Next.js, PostCSS, dan sharp. Perbaikan Next.js yang ditawarkan audit berada di luar versi yang dikunci saat pemeriksaan; upgrade perlu diuji dan tidak diterapkan otomatis. Jalankan kembali `npm audit` sebelum rilis karena hasil advisori berubah dari waktu ke waktu.
