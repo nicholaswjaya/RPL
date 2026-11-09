@@ -23,10 +23,18 @@ export async function POST(req: Request) {
 
     return NextResponse.json(await processReceiptImage(file, apiKey));
   } catch (error: unknown) {
-    console.error("Critical error backend:", error);
+    const status = error instanceof ReceiptScanError ? 503 : 500;
+    console.error("[API /api/scan] request failed", {
+      status,
+      code: status === 503 ? "RECEIPT_SCAN_FAILED" : "INTERNAL_ERROR",
+    });
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Terjadi kesalahan pada sistem backend." },
-      { status: error instanceof ReceiptScanError ? 503 : 500 }
+      {
+        error: error instanceof ReceiptScanError
+          ? error.message
+          : "Terjadi kesalahan pada sistem backend.",
+      },
+      { status }
     );
   }
 }

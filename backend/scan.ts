@@ -105,8 +105,11 @@ export async function processReceiptImage(
       console.log(`[Percobaan ${attempt}] SUKSES memproses struk!`);
       return result;
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(`[Percobaan ${attempt} Gagal]: ${message}`);
+      console.warn("[ReceiptScan] attempt failed", {
+        attempt,
+        maxRetries,
+        model: currentModel,
+      });
 
       if (attempt < maxRetries) {
         console.log("Menunggu 1.5 detik lalu retry otomatis...");
