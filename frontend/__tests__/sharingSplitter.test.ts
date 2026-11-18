@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  allocateSharingCosts,
   calculateSharingCostPerPerson,
   countEatersPerItem,
   calculatePersonSharingSubtotal,
@@ -62,5 +63,15 @@ describe("sharingSplitter - Aturan Bisnis Pembagian Menu Sharing (Makanan Tengah
   it("menangani pembagian desimal ganjil (seperti Rp 100.000 dibagi 3 orang)", () => {
     const cost = calculateSharingCostPerPerson(100000, 1, 3);
     expect(cost).toBeCloseTo(33333.33, 2);
+  });
+
+  it("mendistribusikan sisa rupiah agar alokasi sharing sama dengan harga item", () => {
+    const costs = allocateSharingCosts(
+      [{ name: "Pizza", price: 10000, qty: 1 }],
+      [{ sharingItems: [0] }, { sharingItems: [0] }, { sharingItems: [0] }]
+    );
+
+    expect([costs[0][0], costs[1][0], costs[2][0]]).toEqual([3334, 3333, 3333]);
+    expect(costs[0][0] + costs[1][0] + costs[2][0]).toBe(10000);
   });
 });

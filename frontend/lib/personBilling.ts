@@ -19,6 +19,34 @@ export interface CalculatedPersonBill {
   totalWithTax: number;
 }
 
+export function reconcilePersonBillTotals<T extends CalculatedPersonBill>(
+  bills: readonly T[],
+  multiplier: number,
+  grandTotal: number
+): T[] {
+  const roundedDownTotals = bills.map((bill) =>
+    Math.floor(bill.rawSubtotal * multiplier)
+  );
+  const remainingRupiah =
+    Math.round(grandTotal) -
+    roundedDownTotals.reduce((sum, total) => sum + total, 0);
+  const remainderOrder = bills
+    .map((bill, index) => ({
+      index,
+      fraction: bill.rawSubtotal * multiplier - roundedDownTotals[index],
+    }))
+    .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
+  const extraRupiahRecipients = new Set(
+    remainderOrder.slice(0, remainingRupiah).map(({ index }) => index)
+  );
+
+  return bills.map((bill, index) => ({
+    ...bill,
+    totalWithTax:
+      roundedDownTotals[index] + (extraRupiahRecipients.has(index) ? 1 : 0),
+  }));
+}
+
 export function calculateSingleItemsSubtotal(assignedItems: readonly AssignedItem[]): number {
   return assignedItems.reduce((acc, item) => {
     const price = Math.max(0, item.price || 0);

@@ -3,6 +3,7 @@ import {
   calculateSingleItemsSubtotal,
   calculateIndividualBill,
   calculateAllPeopleBills,
+  reconcilePersonBillTotals,
   verifyBillSumBalance,
 } from "../lib/personBilling";
 
@@ -96,5 +97,22 @@ describe("personBilling - Aturan Bisnis Rincian Tagihan Bersih Per Individu", ()
     const { rawSubtotal, totalWithTax } = calculateIndividualBill(0, 50000, 1.1);
     expect(rawSubtotal).toBe(50000);
     expect(totalWithTax).toBe(55000);
+  });
+
+  it("mendistribusikan selisih pembulatan agar total anggota tepat sama dengan bill", () => {
+    const bills = [0, 1, 2].map((index) => ({
+      name: `Anggota ${index + 1}`,
+      singleSubtotal: 0,
+      sharingSubtotal: 10000 / 3,
+      rawSubtotal: 10000 / 3,
+      totalWithTax: 3333,
+    }));
+
+    const reconciled = reconcilePersonBillTotals(bills, 1, 10000);
+
+    expect(reconciled.map((bill) => bill.totalWithTax)).toEqual([3334, 3333, 3333]);
+    expect(reconciled.reduce((sum, bill) => sum + bill.totalWithTax, 0)).toBe(
+      10000
+    );
   });
 });
