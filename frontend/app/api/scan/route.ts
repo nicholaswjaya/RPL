@@ -24,7 +24,10 @@ export async function POST(req: Request) {
 
     const uploadError = validateReceiptUpload(file);
     if (uploadError) {
-      return NextResponse.json({ error: uploadError }, { status: 400 });
+      return NextResponse.json(
+        { error: uploadError.message },
+        { status: uploadError.status }
+      );
     }
 
     return NextResponse.json(await processReceiptImage(file, apiKey));
