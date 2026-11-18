@@ -122,4 +122,20 @@ describe("receiptNormalizer - Aturan Bisnis Normalisasi Data Hasil Scan AI Struk
     expect(validateScannedReceipt(infiniteQuantity)).toContain("tidak valid");
     expect(validateScannedReceipt(validReceipt)).toBeNull();
   });
+
+  it("memperlakukan pajak null sebagai tidak tersedia, bukan nol", () => {
+    const nullTax = normalizeReceiptData({
+      items: [{ name: "Kopi", price: 20000, qty: 1 }],
+      tax: null,
+    });
+    const explicitZeroTax = normalizeReceiptData({
+      items: [{ name: "Kopi", price: 20000, qty: 1 }],
+      tax: 0,
+    });
+
+    expect(nullTax.taxRate).toBe(10);
+    expect(nullTax.taxAmount).toBe(2000);
+    expect(explicitZeroTax.taxRate).toBe(0);
+    expect(explicitZeroTax.taxAmount).toBe(0);
+  });
 });
