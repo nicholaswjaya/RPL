@@ -8,6 +8,7 @@ import { normalizeReceiptData, RawReceiptPayload } from "../lib/receiptNormalize
 export default function Home() {
   const [mode, setMode] = useState<"ai" | "manual">("manual");
   const [billData, setBillData] = useState<BillData | null>(null);
+  const [isEditingBill, setIsEditingBill] = useState(false);
   const [loadingAI, setLoadingAI] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export default function Home() {
   // Menerima data bill yang siap dibagi (baik dari AI maupun Manual)
   const handleDataReady = (data: BillData) => {
     setBillData(data);
+    setIsEditingBill(false);
     setScanError(null);
   };
 
@@ -70,7 +72,7 @@ export default function Home() {
         </p>
       </div>
 
-      {!billData ? (
+      {!billData || isEditingBill ? (
         <>
           {/* Navigasi Toggle Scan AI / Input Manual */}
           <div className="max-w-md mx-auto mb-6 flex bg-gray-200 p-1 rounded-xl shadow-inner">
@@ -149,7 +151,7 @@ export default function Home() {
           billData={billData}
           onReset={() => {
             setMode("manual");
-            setBillData(null);
+            setIsEditingBill(true);
           }}
         />
       )}
