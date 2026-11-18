@@ -4,6 +4,37 @@ export interface SharingItemInfo {
   qty: number;
 }
 
+export function allocateSharingCosts(
+  items: readonly SharingItemInfo[],
+  people: readonly { sharingItems: readonly number[] }[]
+): Record<number, Record<number, number>> {
+  const costsByPerson: Record<number, Record<number, number>> = {};
+  people.forEach((_, personIndex) => {
+    costsByPerson[personIndex] = {};
+  });
+
+  items.forEach((item, itemIndex) => {
+    const eaterIndices = people
+      .map((person, personIndex) => ({ person, personIndex }))
+      .filter(({ person }) => person.sharingItems.includes(itemIndex))
+      .map(({ personIndex }) => personIndex);
+    if (eaterIndices.length === 0) return;
+
+    const totalCost = Math.round(
+      Math.max(0, item.price || 0) * Math.max(0, item.qty || 0)
+    );
+    const baseCost = Math.floor(totalCost / eaterIndices.length);
+    const remainingRupiah = totalCost - baseCost * eaterIndices.length;
+
+    eaterIndices.forEach((personIndex, eaterPosition) => {
+      costsByPerson[personIndex][itemIndex] =
+        baseCost + (eaterPosition < remainingRupiah ? 1 : 0);
+    });
+  });
+
+  return costsByPerson;
+}
+
 export function calculateSharingCostPerPerson(
   price: number,
   qty: number,

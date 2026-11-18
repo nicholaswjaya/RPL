@@ -2,10 +2,16 @@
 
 import React, { useState } from "react";
 import { BillData } from "./ManualInputForm";
-import { countEatersPerItem, calculatePersonSharingSubtotal } from "../lib/sharingSplitter";
-import { calculateSingleItemsSubtotal, calculateIndividualBill, verifyBillSumBalance } from "../lib/personBilling";
+import { allocateSharingCosts, countEatersPerItem } from "../lib/sharingSplitter";
+import {
+  calculateSingleItemsSubtotal,
+  calculateIndividualBill,
+  reconcilePersonBillTotals,
+  verifyBillSumBalance,
+} from "../lib/personBilling";
 import {
   initializeSinglePool,
+  hasDuplicatePersonName,
   restoreItemsToPool,
   validateAllocationPool,
   formatWhatsAppSummary,
@@ -55,11 +61,15 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   const taxAmount = typeof billData.taxAmount === "number"
     ? billData.taxAmount
     : (rawSubtotal * (billData.taxRate || 0)) / 100;
-  const netTotal = Math.max(0, rawSubtotal + taxAmount + billData.service - billData.discount);
+  const netTotal = Math.max(
+    0,
+    Math.round(rawSubtotal + taxAmount + billData.service - billData.discount)
+  );
   const multiplier = rawSubtotal > 0 ? netTotal / rawSubtotal : 1;
 
   // Peta jumlah eater menu sharing
   const eatersCounts = countEatersPerItem(people);
+  const sharingCostsByPerson = allocateSharingCosts(billData.items, people);
 
   // Validasi sisa alokasi item
   const poolValidation = validateAllocationPool(billData.items, remainingSingleItems, eatersCounts);
@@ -98,6 +108,11 @@ export default function SplitBillSection({ billData, onReset }: Props) {
     e.preventDefault();
     if (!currentName.trim()) {
       setInputError("Masukkan nama orang terlebih dahulu!");
+      return;
+    }
+
+    if (hasDuplicatePersonName(currentName, people.map((person) => person.name))) {
+      setInputError("Nama anggota sudah digunakan. Gunakan nama yang berbeda.");
       return;
     }
 
@@ -147,13 +162,11 @@ export default function SplitBillSection({ billData, onReset }: Props) {
   };
 
   // Hitung rincian untuk tiap orang
-  const calculatedPeople = people.map((person) => {
+  const individualBills = people.map((person, personIndex) => {
     const singleSubtotal = calculateSingleItemsSubtotal(person.assignedItems);
-    const sharingSubtotal = calculatePersonSharingSubtotal(
-      person.sharingItems,
-      billData.items,
-      eatersCounts
-    );
+    const sharingSubtotal = Object.values(
+      sharingCostsByPerson[personIndex]
+    ).reduce((sum, cost) => sum + cost, 0);
     const { rawSubtotal: personRawSubtotal, totalWithTax } = calculateIndividualBill(
       singleSubtotal,
       sharingSubtotal,
@@ -161,13 +174,18 @@ export default function SplitBillSection({ billData, onReset }: Props) {
     );
 
     return {
+      name: person.name,
       person,
+      personIndex,
       singleSubtotal,
       sharingSubtotal,
       rawSubtotal: personRawSubtotal,
       totalWithTax,
     };
   });
+  const calculatedPeople = poolValidation.isFullyAllocated
+    ? reconcilePersonBillTotals(individualBills, multiplier, netTotal)
+    : individualBills;
 
   const balanceCheck = verifyBillSumBalance(
     calculatedPeople.map((cp) => ({
@@ -193,7 +211,7 @@ export default function SplitBillSection({ billData, onReset }: Props) {
       sharingItemsNames: cp.person.sharingItems.map((idx) => {
         const item = billData.items[idx];
         const eaters = eatersCounts[idx] || 1;
-        const cost = item ? (item.price * item.qty) / eaters : 0;
+        const cost = sharingCostsByPerson[cp.personIndex][idx] || 0;
         return {
           name: item ? item.name : `Menu #${idx + 1}`,
           eaters,
@@ -433,7 +451,13 @@ export default function SplitBillSection({ billData, onReset }: Props) {
           {people.length > 0 && (
             <button
               onClick={handleCopyWhatsApp}
-              className="px-3 py-1.5 bg-green-600 text-white font-semibold text-xs rounded-lg hover:bg-green-700 transition flex items-center gap-1.5 shadow-sm"
+              disabled={!poolValidation.isFullyAllocated}
+              title={
+                poolValidation.isFullyAllocated
+                  ? undefined
+                  : "Alokasikan semua menu sebelum membagikan ringkasan."
+              }
+              className="px-3 py-1.5 bg-green-600 text-white font-semibold text-xs rounded-lg hover:bg-green-700 transition flex items-center gap-1.5 shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span>{copiedToast ? "Tersalin!" : "Salin ke WhatsApp"}</span>
             </button>
@@ -485,14 +509,14 @@ export default function SplitBillSection({ billData, onReset }: Props) {
                   {cp.person.sharingItems.map((itemIndex) => {
                     const item = billData.items[itemIndex];
                     const eaters = eatersCounts[itemIndex] || 1;
-                    const cost = item ? (item.price * item.qty) / eaters : 0;
+                    const cost = sharingCostsByPerson[cp.personIndex][itemIndex] || 0;
                     return (
                       <div
                         key={`s-${itemIndex}`}
                         className="flex justify-between text-xs text-blue-900 bg-blue-100/60 px-2 py-1 rounded"
                       >
                         <span>{item?.name} (Sharing 1/{eaters} orang)</span>
-                        <span>Rp {Math.round(cost).toLocaleString("id-ID")}</span>
+                        <span>Rp {cost.toLocaleString("id-ID")}</span>
                       </div>
                     );
                   })}

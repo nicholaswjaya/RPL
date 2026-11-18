@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
   initializeSinglePool,
+  hasDuplicatePersonName,
   restoreItemsToPool,
   validateAllocationPool,
   formatWhatsAppSummary,
 } from "../lib/poolValidator";
 
 describe("poolValidator - Aturan Bisnis Pelacakan Sisa Porsi & Validasi Keterbagian", () => {
+  it("mendeteksi nama anggota duplikat tanpa membedakan kapitalisasi atau spasi", () => {
+    expect(hasDuplicatePersonName(" bUdI ", ["Budi"])).toBe(true);
+    expect(hasDuplicatePersonName("Ani", ["Budi"])).toBe(false);
+  });
+
   it("menginisialisasi pool porsi untuk menu single dan mengabaikan menu sharing", () => {
     const items = [
       { name: "Ayam Bakar", qty: 3, isSharing: false },

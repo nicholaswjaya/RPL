@@ -28,6 +28,35 @@ export interface NormalizedBillData {
   discount: number;
 }
 
+function parseOptionalNumber(
+  value: number | string | null | undefined
+): number {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === "string" && value.trim() === "")
+  ) {
+    return NaN;
+  }
+
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : NaN;
+}
+
+export function validateScannedReceipt(data: NormalizedBillData): string | null {
+  const hasInvalidItem = data.items.some(
+    (item) =>
+      !Number.isFinite(item.price) ||
+      item.price <= 0 ||
+      !Number.isFinite(item.qty) ||
+      item.qty <= 0
+  );
+
+  return hasInvalidItem
+    ? "Hasil scan memiliki harga atau kuantitas yang tidak valid. Coba scan ulang atau gunakan input manual."
+    : null;
+}
+
 export function normalizeReceiptData(payload?: RawReceiptPayload | null): NormalizedBillData {
   if (!payload || typeof payload !== "object") {
     return {
@@ -59,8 +88,8 @@ export function normalizeReceiptData(payload?: RawReceiptPayload | null): Normal
 
   const subtotal = finalItems.reduce((acc, it) => acc + it.price * it.qty, 0);
 
-  const rawTax = Number(payload.tax);
-  const rawTaxRate = Number(payload.taxRate);
+  const rawTax = parseOptionalNumber(payload.tax);
+  const rawTaxRate = parseOptionalNumber(payload.taxRate);
 
   let taxAmount = 0;
   let taxRate = 0;
@@ -76,10 +105,10 @@ export function normalizeReceiptData(payload?: RawReceiptPayload | null): Normal
     taxAmount = (subtotal * taxRate) / 100;
   }
 
-  const rawService = Number(payload.service);
+  const rawService = parseOptionalNumber(payload.service);
   const service = !isNaN(rawService) && rawService > 0 ? Math.round(rawService) : 0;
 
-  const rawDiscount = Number(payload.discount);
+  const rawDiscount = parseOptionalNumber(payload.discount);
   const discount = !isNaN(rawDiscount) && rawDiscount > 0 ? Math.round(rawDiscount) : 0;
 
   return {
