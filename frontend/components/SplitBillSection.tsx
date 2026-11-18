@@ -11,6 +11,7 @@ import {
 } from "../lib/personBilling";
 import {
   initializeSinglePool,
+  hasDuplicatePersonName,
   restoreItemsToPool,
   validateAllocationPool,
   formatWhatsAppSummary,
@@ -107,6 +108,11 @@ export default function SplitBillSection({ billData, onReset }: Props) {
     e.preventDefault();
     if (!currentName.trim()) {
       setInputError("Masukkan nama orang terlebih dahulu!");
+      return;
+    }
+
+    if (hasDuplicatePersonName(currentName, people.map((person) => person.name))) {
+      setInputError("Nama anggota sudah digunakan. Gunakan nama yang berbeda.");
       return;
     }
 

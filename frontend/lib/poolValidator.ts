@@ -13,6 +13,17 @@ export interface UnassignedSummary {
   unassignedSharingIndices: number[];
 }
 
+export function hasDuplicatePersonName(
+  name: string,
+  existingNames: readonly string[]
+): boolean {
+  const normalizedName = name.trim().toLocaleLowerCase("id-ID");
+  return existingNames.some(
+    (existingName) =>
+      existingName.trim().toLocaleLowerCase("id-ID") === normalizedName
+  );
+}
+
 export function initializeSinglePool(items: readonly { qty: number; isSharing: boolean }[]): Record<number, number> {
   const pool: Record<number, number> = {};
   items.forEach((item, index) => {
