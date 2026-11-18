@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { processReceiptImage, ReceiptScanError } from "../../../../backend/scan";
+import { validateReceiptUpload } from "../../../../backend/uploadValidation";
 
 export async function POST(req: Request) {
   try {
@@ -19,6 +20,11 @@ export async function POST(req: Request) {
         { error: "Tidak ada file gambar yang diunggah" },
         { status: 400 }
       );
+    }
+
+    const uploadError = validateReceiptUpload(file);
+    if (uploadError) {
+      return NextResponse.json({ error: uploadError }, { status: 400 });
     }
 
     return NextResponse.json(await processReceiptImage(file, apiKey));
