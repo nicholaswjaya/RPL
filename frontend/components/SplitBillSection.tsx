@@ -433,7 +433,13 @@ export default function SplitBillSection({ billData, onReset }: Props) {
           {people.length > 0 && (
             <button
               onClick={handleCopyWhatsApp}
-              className="px-3 py-1.5 bg-green-600 text-white font-semibold text-xs rounded-lg hover:bg-green-700 transition flex items-center gap-1.5 shadow-sm"
+              disabled={!poolValidation.isFullyAllocated}
+              title={
+                poolValidation.isFullyAllocated
+                  ? undefined
+                  : "Alokasikan semua menu sebelum membagikan ringkasan."
+              }
+              className="px-3 py-1.5 bg-green-600 text-white font-semibold text-xs rounded-lg hover:bg-green-700 transition flex items-center gap-1.5 shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span>{copiedToast ? "Tersalin!" : "Salin ke WhatsApp"}</span>
             </button>
