@@ -3,7 +3,11 @@
 import { useState } from "react";
 import ManualInputForm, { BillData } from "../components/ManualInputForm";
 import SplitBillSection from "../components/SplitBillSection";
-import { normalizeReceiptData, RawReceiptPayload } from "../lib/receiptNormalizer";
+import {
+  normalizeReceiptData,
+  RawReceiptPayload,
+  validateScannedReceipt,
+} from "../lib/receiptNormalizer";
 
 export default function Home() {
   const [mode, setMode] = useState<"ai" | "manual">("manual");
@@ -53,6 +57,10 @@ export default function Home() {
 
       // Normalisasi payload AI menjadi BillData yang valid
       const normalized = normalizeReceiptData(data);
+      const validationError = validateScannedReceipt(normalized);
+      if (validationError) {
+        throw new Error(validationError);
+      }
       handleDataReady(normalized);
     } catch (err: unknown) {
       setScanError(err instanceof Error ? err.message : "Gagal memproses AI.");

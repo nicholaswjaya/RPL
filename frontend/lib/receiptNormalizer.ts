@@ -28,6 +28,20 @@ export interface NormalizedBillData {
   discount: number;
 }
 
+export function validateScannedReceipt(data: NormalizedBillData): string | null {
+  const hasInvalidItem = data.items.some(
+    (item) =>
+      !Number.isFinite(item.price) ||
+      item.price <= 0 ||
+      !Number.isFinite(item.qty) ||
+      item.qty <= 0
+  );
+
+  return hasInvalidItem
+    ? "Hasil scan memiliki harga atau kuantitas yang tidak valid. Coba scan ulang atau gunakan input manual."
+    : null;
+}
+
 export function normalizeReceiptData(payload?: RawReceiptPayload | null): NormalizedBillData {
   if (!payload || typeof payload !== "object") {
     return {

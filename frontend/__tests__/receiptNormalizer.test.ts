@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { normalizeReceiptData } from "../lib/receiptNormalizer";
+import {
+  normalizeReceiptData,
+  validateScannedReceipt,
+} from "../lib/receiptNormalizer";
 
 describe("receiptNormalizer - Aturan Bisnis Normalisasi Data Hasil Scan AI Struk", () => {
   it("menormalisasi data struk valid yang diekstrak dari AI Vision", () => {
@@ -102,5 +105,21 @@ describe("receiptNormalizer - Aturan Bisnis Normalisasi Data Hasil Scan AI Struk
     expect(normalizedNull.items).toHaveLength(1);
     expect(normalizedNull.items[0].name).toBe("");
     expect(normalizedNull.taxRate).toBe(10);
+  });
+
+  it("menolak hasil scan yang mengandung harga atau kuantitas tidak valid", () => {
+    const zeroPrice = normalizeReceiptData({
+      items: [{ name: "Menu", price: 0, qty: 1 }],
+    });
+    const infiniteQuantity = normalizeReceiptData({
+      items: [{ name: "Menu", price: 10000, qty: Infinity }],
+    });
+    const validReceipt = normalizeReceiptData({
+      items: [{ name: "Menu", price: 10000, qty: 1 }],
+    });
+
+    expect(validateScannedReceipt(zeroPrice)).toContain("tidak valid");
+    expect(validateScannedReceipt(infiniteQuantity)).toContain("tidak valid");
+    expect(validateScannedReceipt(validReceipt)).toBeNull();
   });
 });
