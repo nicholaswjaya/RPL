@@ -64,10 +64,29 @@ describe("billCalculation - Aturan Bisnis Kalkulasi Tagihan & Pajak", () => {
     expect(sanitizePercentage(150)).toBe(100);
     expect(sanitizePercentage(10)).toBe(10);
     expect(sanitizePercentage(NaN)).toBe(0);
+    expect(sanitizePercentage(Infinity)).toBe(0);
 
     expect(sanitizeCurrency(-1000)).toBe(0);
     expect(sanitizeCurrency(1500.8)).toBe(1501);
     expect(sanitizeCurrency(NaN)).toBe(0);
+    expect(sanitizeCurrency(Infinity)).toBe(0);
+  });
+
+  it("mengabaikan harga atau kuantitas Infinity agar grand total tetap terbatas", () => {
+    const result = calculateBillTotals(
+      [
+        { price: Infinity, qty: 1 },
+        { price: 10000, qty: Infinity },
+      ],
+      10,
+      Infinity,
+      Infinity
+    );
+
+    expect(result.subtotal).toBe(0);
+    expect(result.taxAmount).toBe(0);
+    expect(result.grandTotal).toBe(0);
+    expect(Number.isFinite(result.grandTotal)).toBe(true);
   });
 
   it("menangani keranjang kosong tanpa menyebabkan pembagian dengan nol (division by zero)", () => {
