@@ -11,13 +11,13 @@ export interface BillTotalsResult {
 }
 
 export function sanitizePercentage(value: number): number {
-  if (!Number.isFinite(value) || value < 0) return 0;
+  if (isNaN(value) || value < 0) return 0;
   if (value > 100) return 100;
   return value;
 }
 
 export function sanitizeCurrency(value: number): number {
-  if (!Number.isFinite(value) || value < 0) return 0;
+  if (isNaN(value) || value < 0) return 0;
   return Math.round(value);
 }
 
@@ -32,10 +32,8 @@ export function calculateBillTotals(
   const safeDiscount = sanitizeCurrency(discount);
 
   const subtotal = items.reduce((total, item) => {
-    const itemPrice =
-      Number.isFinite(item.price) ? Math.max(0, item.price) : 0;
-    const itemQty =
-      Number.isFinite(item.qty) ? Math.max(0, item.qty) : 0;
+    const itemPrice = Math.max(0, item.price || 0);
+    const itemQty = Math.max(0, item.qty || 0);
     return total + itemPrice * itemQty;
   }, 0);
 
